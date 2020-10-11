@@ -179,6 +179,27 @@ func (t Table) Grab() [][]string {
 	return output
 }
 
+func (t Table) plotgrab(identifiercolumn, datacolumn string) (names []string, data [][]float64) {
+	column1index, real := t.verifycolumn(identifiercolumn)
+	column2index, real2 := t.verifycolumn(datacolumn)
+	if real == true && real2 == true {
+		for index := range t.Rows {
+			item := []float64{}
+			for columnindex := range t.Rows[index] {
+				if columnindex == column1index {
+					names = append(names, t.Rows[index][column1index])
+				}
+				if columnindex == column2index {
+					x, _ := strconv.ParseFloat(t.Rows[index][columnindex], 64)
+					item = append(item, x)
+				}
+			}
+			data = append(data, item)
+		}
+	}
+	return names, data
+}
+
 func (t Table) meanall(column int) (float64, float64) {
 	var sum float64
 	var howmany = float64(len(t.Rows))
@@ -509,4 +530,55 @@ func (t Table) Grabdata(identifiercolumn string) (names []string, data [][]float
 		}
 	}
 	return names, data
+}
+
+func (t Table) Scatterplot(column, column2 string) {
+	output := make(map[string][]float64)
+	_, real := t.verifycolumn(column)
+	if real == true {
+		names, data := t.plotgrab(column, column2)
+		for index := range data {
+			for i := range data[index] {
+				output[names[index]] = append(output[names[index]], data[index][i])
+			}
+		}
+	}
+	if err := ui.Init(); err != nil {
+		log.Fatalf("failed to initialize termui: %v", err)
+	}
+	defer ui.Close()
+
+	p2 := widgets.NewPlot()
+	p2.Marker = widgets.MarkerDot
+	p2.Data = make([][]float64, len(output))
+	var i = 0
+	var text = "Key: "
+	for index, plotdata := range output {
+		p2.Data[i] = plotdata
+		text += index + "-" + color(i+1)
+		if i != len(output)-1 {
+			text += ", "
+		} else {
+			text += " (press q to quit)"
+		}
+		i++
+	}
+	p2.SetRect(0, 0, 80, 30)
+	p2.AxesColor = ui.ColorWhite
+	p2.PlotType = widgets.ScatterPlot
+	p2.Title = column2 + " for different " + column
+	ui.Render(p2)
+	for i := 0; i < 30; i++ {
+		fmt.Printf("\n")
+	}
+	fmt.Printf("%s", text)
+	uiEvents := ui.PollEvents()
+	for {
+		e := <-uiEvents
+		switch e.ID {
+		case "q", "<C-c>":
+			return
+		}
+
+	}
 }
