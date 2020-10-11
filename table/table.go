@@ -11,6 +11,9 @@ import (
 	"sync"
 	"time"
 	"unicode"
+	
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 )
 
 //Table is a struct containing the name, columns and rows of a table.
