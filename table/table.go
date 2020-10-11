@@ -3,6 +3,7 @@ package table
 import (
 	"crypto/sha256"
 	"fmt"
+	"log"
 	"math"
 	"regexp"
 	"sort"
@@ -11,8 +12,8 @@ import (
 	"sync"
 	"time"
 	"unicode"
-	
-	ui "github.com/gizak/termui/v3" //for scatterplots
+
+	ui "github.com/gizak/termui/v3"              //for scatterplots
 	widgets "github.com/gizak/termui/v3/widgets" //for scatterplots
 )
 
@@ -102,6 +103,28 @@ func contains(arr []string, str string, howmany int) (int, bool) {
 		return x, true
 	}
 	return 0, false
+}
+
+func color(index int) string {
+	switch index {
+	case 0:
+		return "black"
+	case 1:
+		return "red"
+	case 2:
+		return "green"
+	case 3:
+		return "yellow"
+	case 4:
+		return "blue"
+	case 5:
+		return "magenta"
+	case 6:
+		return "cyan"
+	case 7:
+		return "white"
+	}
+	return ""
 }
 
 func get(table map[[32]byte]string, item string) (string, [32]byte) {
