@@ -427,6 +427,13 @@ func (d Database) Order(tablename, columnname string, order bool) {
 	}
 }
 
+//Scatterplot - pass a table, a column of items and a datacolumn for scatter plot.
+func (d Database) Scatterplot(table, namecolumn, datacolumn string) {
+	if yes, index := d.verifytable(table); yes == true {
+		d.Table[index].Scatterplot(namecolumn, datacolumn)
+	}
+}
+
 //AddIndex adds index column to wahtever is stored currently in Temptable
 //Integer is where index starts from i.e 0 = starts from 0.
 func (d Database) AddIndex(start int) {
