@@ -531,7 +531,7 @@ func (d Database) KNNclass(trainingtable, testtable, identifiercolumn string, kn
 		testingname, testingdata = d.Table[table2index].Grabdata(identifiercolumn)
 	}
 	fmt.Println("KNN classification - processing...")
-	models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, trainingmode, false)
+	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, trainingmode, false)
 }
 
 //KNN regression using a training table to predict numerical output on test table using identifier column.
@@ -549,5 +549,5 @@ func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knum
 		testingname, testingdata = d.Table[table2index].Grabdata(identifiercolumn)
 	}
 	fmt.Println("KNN regression - processing...")
-	models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, false, true)
+	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, false, true)
 }
