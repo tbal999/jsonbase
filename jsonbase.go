@@ -323,6 +323,11 @@ func (d Database) Sum(tablename, columnname string) {
 	}
 }
 
+//Clear deletes all data currently in temptable buffer
+func (d Database) Clear() {
+	Temptable = [][]string{}
+}
+
 //Shuffle lets you shuffle data in a table randomly
 //Affects table directly
 func (d *Database) Shuffle(tablename string) {
