@@ -12,8 +12,8 @@ import (
 	"time"
 	"unicode"
 	
-	ui "github.com/gizak/termui/v3"
-	widgets "github.com/gizak/termui/v3/widgets"
+	ui "github.com/gizak/termui/v3" //for scatterplots
+	widgets "github.com/gizak/termui/v3/widgets" //for scatterplots
 )
 
 //Table is a struct containing the name, columns and rows of a table.
