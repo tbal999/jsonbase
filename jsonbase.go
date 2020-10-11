@@ -511,21 +511,38 @@ func (d *Database) Split(tablename, trainingname, testname string, ratio int) {
 	*d = D
 }
 
-//KNN classifier using trainingtable to predict output on testtable using identifiercolumn. Can also handle text.
-//Standard is classification, switch to regression via bool if you want regression. TRAINING WORKS FOR CLASSIFICATION ONLY.
+//KNN classifier using a training table to predict output on test table using identifier column.
 //Passes to Buffer
-func (d Database) KNN(trainingtable, testtable, identifiercolumn string, knumber int, trainingmode bool) {
+func (d Database) KNNclass(trainingtable, testtable, identifiercolumn string, knumber int, trainingmode bool) {
 	var trainingdata [][]float64
 	var trainingname []string
 	var testingdata [][]float64
 	var testingname []string
-	fmt.Println("KNN importing data...")
+	fmt.Println("KNN classification - importing data...")
 	if yes, table1index := d.verifytable(trainingtable); yes == true {
 		trainingname, trainingdata = d.Table[table1index].Grabdata(identifiercolumn)
 	}
 	if yes, table2index := d.verifytable(trainingtable); yes == true {
 		testingname, testingdata = d.Table[table2index].Grabdata(identifiercolumn)
 	}
-	fmt.Println("KNN processing...")
+	fmt.Println("KNN classification - processing...")
 	models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, trainingmode, false)
+}
+
+//KNN regression using a training table to predict numerical output on test table using identifier column.
+//Passes to Buffer
+func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knumber int) {
+	var trainingdata [][]float64
+	var trainingname []string
+	var testingdata [][]float64
+	var testingname []string
+	fmt.Println("KNN regression - importing data...")
+	if yes, table1index := d.verifytable(trainingtable); yes == true {
+		trainingname, trainingdata = d.Table[table1index].Grabdata(identifiercolumn)
+	}
+	if yes, table2index := d.verifytable(trainingtable); yes == true {
+		testingname, testingdata = d.Table[table2index].Grabdata(identifiercolumn)
+	}
+	fmt.Println("KNN regression - processing...")
+	models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, false, true)
 }
