@@ -3,7 +3,6 @@ package table
 import (
 	"crypto/sha256"
 	"fmt"
-	"log"
 	"math"
 	"regexp"
 	"sort"
