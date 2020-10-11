@@ -59,6 +59,7 @@ What can you do with it?
 
 ## Machine learning / stats
 - You can describe a dataset on a specific column via 'Describe()'
+- You can plot scatterplots (making use of termui library)
 - You can use KNN machine learning algorithm, I have implemented it into jsonbase so you can predict data using training data.
 
 Using a combination of the above, and the buffer, you can perform a lot of tasks.
