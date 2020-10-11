@@ -225,7 +225,7 @@ func (t Table) plotgrab(identifiercolumn, datacolumn string) (names []string, da
 	return names, data
 }
 
-func (t Table) collectdata(column1, column2 string) map[string][]float64 {
+func (t Table) collectdata(column, column2 string) map[string][]float64 {
 output := make(map[string][]float64)
 	_, real := t.verifycolumn(column)
 	if real == true {
