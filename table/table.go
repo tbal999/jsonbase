@@ -557,8 +557,8 @@ func (t Table) Grabdata(identifiercolumn string) (names []string, data [][]float
 	return names, data
 }
 
-func (t Table) Scatterplot(column, column2 string) {
-	output := make(map[string][]float64)
+func (t Table) collectdata(column1, column2 string) map[string][]float64 {
+output := make(map[string][]float64)
 	_, real := t.verifycolumn(column)
 	if real == true {
 		names, data := t.plotgrab(column, column2)
@@ -568,6 +568,11 @@ func (t Table) Scatterplot(column, column2 string) {
 			}
 		}
 	}
+	return output
+}
+
+func (t Table) Scatterplot(column, column2 string) {
+	output := t.collectdata(column,column2)
 	if err := ui.Init(); err != nil {
 		fmt.Println("Error generating plot")
 		return
