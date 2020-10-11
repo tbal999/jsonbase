@@ -594,7 +594,7 @@ func (t Table) Scatterplot(column, column2 string) {
 	p2.PlotType = widgets.ScatterPlot
 	p2.Title = column2 + " for different " + column
 	ui.Render(p2)
-	for i := 0; i < 30; i++ {
+	for i := 0; i < 29; i++ {
 		fmt.Printf("\n")
 	}
 	fmt.Printf("%s", text)
