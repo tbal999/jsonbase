@@ -225,6 +225,20 @@ func (t Table) plotgrab(identifiercolumn, datacolumn string) (names []string, da
 	return names, data
 }
 
+func (t Table) collectdata(column1, column2 string) map[string][]float64 {
+output := make(map[string][]float64)
+	_, real := t.verifycolumn(column)
+	if real == true {
+		names, data := t.plotgrab(column, column2)
+		for index := range data {
+			for i := range data[index] {
+				output[names[index]] = append(output[names[index]], data[index][i])
+			}
+		}
+	}
+	return output
+}
+
 func (t Table) meanall(column int) (float64, float64) {
 	var sum float64
 	var howmany = float64(len(t.Rows))
@@ -557,19 +571,6 @@ func (t Table) Grabdata(identifiercolumn string) (names []string, data [][]float
 	return names, data
 }
 
-func (t Table) collectdata(column1, column2 string) map[string][]float64 {
-output := make(map[string][]float64)
-	_, real := t.verifycolumn(column)
-	if real == true {
-		names, data := t.plotgrab(column, column2)
-		for index := range data {
-			for i := range data[index] {
-				output[names[index]] = append(output[names[index]], data[index][i])
-			}
-		}
-	}
-	return output
-}
 
 func (t Table) Scatterplot(column, column2 string) {
 	output := t.collectdata(column,column2)
