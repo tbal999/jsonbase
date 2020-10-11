@@ -570,7 +570,8 @@ func (t Table) Scatterplot(column, column2 string) {
 		}
 	}
 	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
+		fmt.Println("Error generating plot")
+		return
 	}
 	defer ui.Close()
 
