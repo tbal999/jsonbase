@@ -524,7 +524,7 @@ func (d Database) Describe(table, dependentcolumn string) {
 //Select lets you trim columns in temptable buffer to specific columns.
 //You must pass in a 1D string array of column headers.
 //Passes to Buffer
-func (d DataBase) Select(columns []string) {
+func (d Database) Select(columns []string) {
 	replacers := []string{}
 	for index := range columns {
 		if output, item := grabsubstring(columns[index]); output != "" {
