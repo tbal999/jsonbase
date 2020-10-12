@@ -23,7 +23,7 @@ type Table struct {
 	Rows    [][]string
 }
 
-var s sync.Mutex
+var s sync.Mutex //used in some situations i.e hashing.
 
 type Glfunc func(float64) float64
 

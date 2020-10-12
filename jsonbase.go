@@ -2,6 +2,7 @@ package jsonbase
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -26,6 +27,8 @@ type Database struct {
 var Temptable [][]string
 
 /////////////////////      HELPER FUNCTIONS  /////////////////////////////
+
+//checks if table exists in database
 func (d Database) verifytable(name string) (bool, int) {
 	for index := range d.Table {
 		if d.Table[index].Name == name {
@@ -341,6 +344,27 @@ func (d *Database) Shuffle(tablename string) {
 	*d = D
 }
 
+//LoadDBase lets you load a database that you have previously saved
+func (d *Database) LoadDBase(filename string) {
+	item := *d
+	jsonFile, _ := ioutil.ReadFile(filename + ".json")
+	_ = json.Unmarshal([]byte(jsonFile), &item)
+	*d = item
+	fmt.Println("Loaded " + filename + "!")
+}
+
+//SaveDBase lets you save a database that you are currently working with
+func (d Database) SaveDBase(filename string) {
+	Base := &d
+	output, err := json.MarshalIndent(Base, "", "\t")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	_ = ioutil.WriteFile(filename+".json", output, 0755)
+	fmt.Println("Saved " + filename + "!")
+}
+
 //Regex lets you grab a table where items within a column match a regular expression that you can pass in
 //to the function and pulls whether they do or don't match (true/false)
 //Passes to Buffer
@@ -379,8 +403,8 @@ func (d Database) ConditionalInt(tablename, column string, function table.Cnfunc
 }
 
 //Calculation2DInt lets you do calculations on the rows of two numerical columns.
-//You can pass a function of type func(column1, column2 float64) float64.
-//Affects table directly & adds another column (column1 name + _2D_ + column2 name)
+//You can pass a function of type func(x, y float64) float64.
+//Affects table directly & adds another column (x name + _2D_ + y name)
 //Digits is how many decimal places the results will be
 func (d Database) Calculation2DInt(tablename, column1name, column2name string, function table.Gl2func, decimals int) {
 	if yes, index := d.verifytable(tablename); yes == true {
@@ -427,7 +451,7 @@ func (d Database) Order(tablename, columnname string, order bool) {
 	}
 }
 
-//Scatterplot - pass a table, a column of items and a datacolumn for scatter plot.
+//Scatterplot - pass a table, a column of items and a datacolumn for 1D scatter plot of all items.
 func (d Database) Scatterplot(table, namecolumn, datacolumn string) {
 	if yes, index := d.verifytable(table); yes == true {
 		d.Table[index].Scatterplot(namecolumn, datacolumn)
@@ -497,7 +521,7 @@ func (d Database) Describe(table, dependentcolumn string) {
 	}
 }
 
-//Split - split a set of training data up into two new tables (training / testing) at a certain ratio i.e 2 will be 50/50.
+//Split - split a set of data up into two new tables (training / testing) at a certain ratio i.e 2 will be 50/50.
 func (d *Database) Split(tablename, trainingname, testname string, ratio int) {
 	D := *d
 	Testtable := table.Table{}
@@ -523,7 +547,7 @@ func (d *Database) Split(tablename, trainingname, testname string, ratio int) {
 	*d = D
 }
 
-//KNN classifier using a training table to predict output on test table using identifier column.
+//KNNclass classifier using a training table to predict output on test table using identifier column.
 //Passes to Buffer
 func (d Database) KNNclass(trainingtable, testtable, identifiercolumn string, knumber int, trainingmode bool) {
 	var trainingdata [][]float64
@@ -541,7 +565,7 @@ func (d Database) KNNclass(trainingtable, testtable, identifiercolumn string, kn
 	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, trainingmode, false)
 }
 
-//KNN regression using a training table to predict numerical output on test table using identifier column.
+//KNNreg regression using a training table to predict numerical output on test table using identifier column.
 //Passes to Buffer
 func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knumber int) {
 	var trainingdata [][]float64
