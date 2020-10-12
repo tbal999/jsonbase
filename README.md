@@ -41,8 +41,6 @@ What can you do with it?
 
 ## Left Join
 - You can perform a left join on two tables - on one column match
-- There's a one to many join option which uses hash tables and is very fast (but only does one to many)
-- There's a many to many option that uses nested loops, slower but can handle any two sets of data.
 
 ## Replace strings
 - You can use regex to find items in a column, and then replace them with new strings
