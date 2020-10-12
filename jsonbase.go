@@ -543,6 +543,14 @@ func (d Database) Describe(table, dependentcolumn string) {
 	}
 }
 
+//Columns returns a string array of the columns in a specific table 
+//Used for when you want to do adjustments on multiple columns quickly i.e remove whitespaces via a loop
+func (d Database) Columns(table string) []string {
+	if yes, index := d.verifytable(table); yes == true {
+		return d.Table[index].Columns
+	}
+}
+
 //Select lets you trim columns in temptable buffer to specific columns.
 //You must pass in a 1D string array of column headers.
 //Passes to Buffer
