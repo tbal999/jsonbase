@@ -512,6 +512,14 @@ func (d Database) Count(tablename, columnname string) {
 	}
 }
 
+//Unpivot lets you unpivot data in table.
+//Directly affects table.
+func (d Database) Unpivot(tablename, maincolumn, pivotcolumn string) {
+	if yes, index := d.verifytable(tablename); yes == true {
+		d.Table[index].Unpivot(maincolumn, pivotcolumn)
+	}
+}
+
 //Join is: left join table1 on table1.column1 = table2.column2
 //Passes to Buffer
 func (d Database) Join(table1, column1, table2, column2 string) {
