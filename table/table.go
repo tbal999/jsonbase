@@ -531,27 +531,6 @@ func (t *Table) Unpivot(maincolumn string) [][]string {
 	return final
 }
 
-func (t *Table) unpivot(main, pivottable string, newrows *[][]string) {
-	n := *newrows
-	T := *t
-	for rowindex := 0; rowindex < len(T.Rows); rowindex++ {
-		item := []string{}
-		for columnindex := 0; columnindex < len(T.Rows[rowindex]); columnindex++ {
-			if T.Columns[columnindex] == main {
-				item = append(item, T.Rows[rowindex][columnindex])
-			} else {
-				item = append(item, T.Rows[rowindex][columnindex])
-				if len(T.Rows[rowindex]) > 1 {
-					T.Rows[rowindex] = remove1D(T.Rows[rowindex], columnindex)
-					n = append(n, item)
-					*newrows = n
-					t.unpivot(main, pivottable, newrows)
-				}
-			}
-		}
-	}
-}
-
 func (t Table) Count(column string) [][]string {
 	output := [][]string{}
 	hashtable := make(map[[32]byte]string)
