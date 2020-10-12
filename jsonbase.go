@@ -549,6 +549,7 @@ func (d Database) Columns(table string) []string {
 	if yes, index := d.verifytable(table); yes == true {
 		return d.Table[index].Columns
 	}
+	return nil
 }
 
 //Select lets you trim columns in temptable buffer to specific columns.
