@@ -513,10 +513,11 @@ func (t Table) Row(column string, rownumber int) [][]string {
 	return nil
 }
 
-func (t *Table) Unpivot(maincolumn string) {
+func (t *Table) Unpivot(maincolumn string) [][]string {
 	newcolumns := []string{maincolumn, "UNPIVOT", "ITEMS"}
 	item := [][][]string{}
 	final := [][]string{}
+	final = append(final, newcolumns)
 	for rowindex := range t.Rows {
 		in := t.Rows[rowindex]
 		output := collate(maincolumn, in, t.Columns)
@@ -527,10 +528,7 @@ func (t *Table) Unpivot(maincolumn string) {
 			final = append(final, item[index1][index2])
 		}
 	}
-	Temptable = append(Temptable, newcolumns)
-	for index := range final {
-		Temptable = append(Temptable, final[index])
-	}
+	return final
 }
 
 func (t *Table) unpivot(main, pivottable string, newrows *[][]string) {
