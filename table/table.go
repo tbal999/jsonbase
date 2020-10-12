@@ -115,6 +115,31 @@ func remove1D(slice []string, s int) []string {
 	return slice
 }
 
+func collate(main string, row, columns []string) [][]string {
+	output := [][]string{}
+	rowindex := 0
+loop:
+	columnindex := 0
+	for columnindex < len(columns) {
+		item := []string{}
+		if columns[columnindex] == main {
+			item = append(item, row[columnindex])
+			if rowindex < len(row)-1 {
+				rowindex++
+				item = append(item, columns[rowindex])
+			} else {
+				break
+			}
+		}
+		if len(columns) > 1 {
+			item = append(item, row[rowindex])
+			output = append(output, item)
+			goto loop
+		}
+	}
+	return output
+}
+
 func color(index int) string {
 	switch index {
 	case 0:
@@ -488,14 +513,24 @@ func (t Table) Row(column string, rownumber int) [][]string {
 	return nil
 }
 
-func (t *Table) Unpivot(main, pivottable string) {
-	T := *t
-	newcolumns := []string{main, pivottable}
-	newrows := [][]string{}
-	t.unpivot(main, pivottable, &newrows)
-	T.Columns = newcolumns
-	T.Rows = newrows
-	*t = T
+func (t *Table) Unpivot(maincolumn string) {
+	newcolumns := []string{maincolumn, "UNPIVOT", "ITEMS"}
+	item := [][][]string{}
+	final := [][]string{}
+	for rowindex := range t.Rows {
+		in := t.Rows[rowindex]
+		output := collate(maincolumn, in, t.Columns)
+		item = append(item, output)
+	}
+	for index1 := range item {
+		for index2 := range item[index1] {
+			final = append(final, item[index1][index2])
+		}
+	}
+	Temptable = append(Temptable, newcolumns)
+	for index := range final {
+		Temptable = append(Temptable, final[index])
+	}
 }
 
 func (t *Table) unpivot(main, pivottable string, newrows *[][]string) {
