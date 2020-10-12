@@ -104,6 +104,17 @@ func contains(arr []string, str string, howmany int) (int, bool) {
 	return 0, false
 }
 
+func remove1D(slice []string, s int) []string {
+	if s != len(slice) {
+		slice = append(slice[:s], slice[s+1:]...)
+		return slice
+	} else if s == len(slice) {
+		slice = slice[:len(slice)-1]
+		return slice
+	}
+	return slice
+}
+
 func color(index int) string {
 	switch index {
 	case 0:
@@ -475,6 +486,37 @@ func (t Table) Row(column string, rownumber int) [][]string {
 		return output
 	}
 	return nil
+}
+
+func (t *Table) Unpivot(main, pivottable string) {
+	T := *t
+	newcolumns := []string{main, pivottable}
+	newrows := [][]string{}
+	t.unpivot(main, pivottable, &newrows)
+	T.Columns = newcolumns
+	T.Rows = newrows
+	*t = T
+}
+
+func (t *Table) unpivot(main, pivottable string, newrows *[][]string) {
+	n := *newrows
+	T := *t
+	for rowindex := 0; rowindex < len(T.Rows); rowindex++ {
+		item := []string{}
+		for columnindex := 0; columnindex < len(T.Rows[rowindex]); columnindex++ {
+			if T.Columns[columnindex] == main {
+				item = append(item, T.Rows[rowindex][columnindex])
+			} else {
+				item = append(item, T.Rows[rowindex][columnindex])
+				if len(T.Rows[rowindex]) > 1 {
+					T.Rows[rowindex] = remove1D(T.Rows[rowindex], columnindex)
+					n = append(n, item)
+					*newrows = n
+					t.unpivot(main, pivottable, newrows)
+				}
+			}
+		}
+	}
 }
 
 func (t Table) Count(column string) [][]string {
