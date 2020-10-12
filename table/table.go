@@ -118,21 +118,40 @@ func remove1D(slice []string, s int) []string {
 func collate(main string, row, columns []string) [][]string {
 	output := [][]string{}
 	rowindex := 0
+	newcolumns := []string{}
+	newrow := []string{}
+	var first bool
+loop0:
+	for index := range columns {
+		if first == false {
+			if columns[index] == main {
+			newcolumns = append(newcolumns, columns[index])
+			newrow = append(newrow, row[index])
+			first = true
+			goto loop0
+			}
+		} else {
+			if columns[index] != main {
+			newcolumns = append(newcolumns, columns[index])
+			newrow = append(newrow, row[index])
+			}
+		}
+	}
 loop:
 	columnindex := 0
-	for columnindex < len(columns) {
+	for columnindex < len(newcolumns) {
 		item := []string{}
-		if columns[columnindex] == main {
-			item = append(item, row[columnindex])
-			if rowindex < len(row)-1 {
+		if newcolumns[columnindex] == main {
+			item = append(item, newrow[columnindex])
+			if rowindex < len(newrow)-1 {
 				rowindex++
-				item = append(item, columns[rowindex])
+				item = append(item, newcolumns[rowindex])
 			} else {
 				break
 			}
 		}
-		if len(columns) > 1 {
-			item = append(item, row[rowindex])
+		if len(newcolumns) > 1 {
+			item = append(item, newrow[rowindex])
 			output = append(output, item)
 			goto loop
 		}
