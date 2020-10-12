@@ -521,6 +521,46 @@ func (d Database) Describe(table, dependentcolumn string) {
 	}
 }
 
+//Select lets you trim columns in temptable buffer to specific columns.
+//You must pass in a 1D string array of column headers.
+//Passes to Buffer
+func (d DataBase) Select(columns []string) {
+	replacers := []string{}
+	for index := range columns {
+		if output, item := grabsubstring(columns[index]); output != "" {
+			replacers = append(replacers, output)
+			columns[index] = item
+		} else {
+			replacers = append(replacers, item)
+			columns[index] = item
+		}
+	}
+	mainindex := []int{}
+	newoutput := [][]string{}
+	for tempindex := range Temptable[0] {
+		for columnindex := range columns {
+			if Temptable[0][tempindex] == columns[columnindex] {
+				mainindex = append(mainindex, tempindex)
+			}
+		}
+	}
+	for index1 := range Temptable {
+		output := []string{}
+		if index1 != 0 {
+			for index2 := range mainindex {
+				output = append(output, Temptable[index1][mainindex[index2]])
+			}
+		} else {
+			for indexx := range replacers {
+				output = append(output, replacers[indexx])
+			}
+
+		}
+		addslice(&newoutput, output)
+	}
+	Temptable = newoutput
+}
+
 //Split - split a set of data up into two new tables (training / testing) at a certain ratio i.e 2 will be 50/50.
 func (d *Database) Split(tablename, trainingname, testname string, ratio int) {
 	D := *d
