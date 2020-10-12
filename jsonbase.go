@@ -516,7 +516,7 @@ func (d Database) Count(tablename, columnname string) {
 //Passes to Buffer
 func (d Database) Unpivot(tablename, pivotcolumn string) {
 	if yes, index := d.verifytable(tablename); yes == true {
-		d.Table[index].Unpivot(pivotcolumn)
+		Temptable = d.Table[index].Unpivot(pivotcolumn)
 	}
 }
 
