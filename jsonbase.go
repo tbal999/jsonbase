@@ -556,7 +556,7 @@ func (d Database) Select(columns []string) {
 			}
 
 		}
-		addslice(&newoutput, output)
+		table.addslice(&newoutput, output)
 	}
 	Temptable = newoutput
 }
