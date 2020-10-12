@@ -67,7 +67,7 @@ func put1D(hash1dtable *map[[32]byte][]string, item []string) {
 	*hash1dtable = h
 }
 
-func addslice(two *[][]string, one []string) {
+func Addslice(two *[][]string, one []string) {
 	a := *two
 	a = append(a, one)
 	*two = a
@@ -497,7 +497,7 @@ func (t Table) Count(column string) [][]string {
 	for key := range hashtable {
 		str := hashtable[key] + "," + strconv.Itoa(hashget(hashcount, hashtable[key]))
 		newitem := strings.Split(str, ",")
-		addslice(&output, newitem)
+		Addslice(&output, newitem)
 	}
 	return output
 }
