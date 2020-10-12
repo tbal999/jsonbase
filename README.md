@@ -33,6 +33,9 @@ What can you do with it?
 ## Row
 - You can grab items (after ordering them) at a specific row. I.e the second oldest instance of each unique item.
 
+## Unpivot
+- You can unpivot data.
+
 ## Add Index
 - You can add an index to the item.
 
