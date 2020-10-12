@@ -570,7 +570,7 @@ func (d Database) Select(columns []string) {
 			}
 
 		}
-		table.addslice(&newoutput, output)
+		table.Addslice(&newoutput, output)
 	}
 	Temptable = newoutput
 }
