@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"regexp"
 	models "github.com/tbal999/jsonbase/models"
 	table "github.com/tbal999/jsonbase/table"
 	"log"
@@ -28,6 +29,21 @@ var Temptable [][]string
 
 /////////////////////      HELPER FUNCTIONS  /////////////////////////////
 
+func grabsubstring(x string) (string, string) {
+	if yes, _ := regexp.MatchString(`\[([^\[\]]*)\]`, x); yes == true {
+		re := regexp.MustCompile(`\[([^\[\]]*)\]`)
+		submatchall := re.FindAllString(x, -1)
+		for _, element := range submatchall {
+			element = strings.Trim(element, "[")
+			element = strings.Trim(element, "]")
+			return element, strings.Split(x, "[")[0]
+		}
+	}
+	return "", strings.Split(x, "[")[0]
+}
+
+/////////////////////      HELPER FUNCTIONS  /////////////////////////////
+
 //checks if table exists in database
 func (d Database) verifytable(name string) (bool, int) {
 	for index := range d.Table {
@@ -38,8 +54,6 @@ func (d Database) verifytable(name string) (bool, int) {
 	fmt.Println("Table " + name + " does not exist.")
 	return false, 0
 }
-
-/////////////////////      HELPER FUNCTIONS  /////////////////////////////
 
 //ImportFile lets you import delimited flat files. filename is the name of file, delimiter is the delimiter that the file is delimited by.
 //Set 'header' to true if there's a header for the file, otherwise set to false.
