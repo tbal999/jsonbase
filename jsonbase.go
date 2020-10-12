@@ -513,7 +513,7 @@ func (d Database) Count(tablename, columnname string) {
 }
 
 //Unpivot lets you unpivot data in table.
-//Directly affects table.
+//Passes to Buffer
 func (d Database) Unpivot(tablename, pivotcolumn string) {
 	if yes, index := d.verifytable(tablename); yes == true {
 		d.Table[index].Unpivot(pivotcolumn)
