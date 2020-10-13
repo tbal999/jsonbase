@@ -614,13 +614,18 @@ func (t Table) Describe(column string) {
 			}
 		}
 		for index := range columnnames {
-			fmt.Println("MEAN / STANDARD DEVIATION for " + columnnames[index])
+			fmt.Println("Describe for " + columnnames[index])
 			for index2 := range t.Columns {
 				if t.Columns[index2] != column {
 					mean, dev := t.mean(index2, column1index, columnnames[index])
 					fmt.Printf("For column '%s' - average is %f, standard deviation is %f\n", t.Columns[index2], mean, dev)
+					
 				}
 			}
+			fmt.Println("")
+		}
+		for index2 := range t.Columns {
+				t.Focusdata(column,t.Columns[index2]) 
 		}
 	}
 }
@@ -644,6 +649,51 @@ func (t Table) Grabdata(identifiercolumn string) (names []string, data [][]float
 	return names, data
 }
 
+func (t Table) Stats(x []float64) ([]float64, []float64) {
+	minout := []float64{}
+	maxout := []float64{}
+	var lowerquartile float64
+	var upperquartile float64
+	lNumberf :=  math.Floor(0.25 * float64(len(x)))
+	lNumber := int(lNumberf)
+	uNumberf :=  math.Floor(0.75 * float64(len(x)))
+	uNumber := int(uNumberf)
+	if len(x) % 2 == 0 {
+		upperquartile =  (x[uNumber-1] + x[uNumber]) / 2
+		lowerquartile = (x[lNumber-1] + x[lNumber]) / 2
+	} else {
+		upperquartile = x[uNumber]
+		lowerquartile =  x[lNumber]
+	}
+	interquartile := upperquartile-lowerquartile
+	min := lowerquartile - 1.5*interquartile
+	max := upperquartile + 1.5*interquartile
+	for index := range x {
+		if x[index] < min {
+			minout = append(minout, x[index])
+		}
+		if x[index] > max {
+			maxout = append(maxout, x[index])
+		}
+	}
+	return minout, maxout
+}
+
+func (t Table) Focusdata(column1, column2 string ) {
+	output := t.collectdata(column1,column2)
+	var item string
+	list := []float64{}
+	for index, plotdata := range output {
+		item = index
+		list = plotdata
+		fmt.Println("For: "+item+" - column: " +column2)
+		sort.Float64s(list)
+		minoutliers, maxoutliers := t.Stats(list)
+		fmt.Printf("Min outliers: %f\n", minoutliers)
+		fmt.Printf("Max outliers: %f\n", maxoutliers)
+		fmt.Println("")
+	}
+}
 
 func (t Table) Scatterplot(column, column2 string) {
 	output := t.collectdata(column,column2)
@@ -652,7 +702,6 @@ func (t Table) Scatterplot(column, column2 string) {
 		return
 	}
 	defer ui.Close()
-
 	p2 := widgets.NewPlot()
 	p2.Marker = widgets.MarkerDot
 	p2.Data = make([][]float64, len(output))
