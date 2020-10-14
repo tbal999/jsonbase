@@ -698,13 +698,17 @@ func (t Table) stats(x []float64) ([]float64, []float64) {
 
 func scatterinit(x int, mainlist []map[string][]float64, columns []string, column string) {
 	p2 := widgets.NewPlot()
+	p3 := widgets.NewParagraph()
 	p2.Marker = widgets.MarkerDot
 	output := mainlist[x]
 	p2.Data = make([][]float64, len(output))
 	var i = 0
 	var text = "Key: \n"
+	var lenitems = 0
 	for index, plotdata := range output {
 		p2.Data[i] = plotdata
+		lenitems = int(len(plotdata)+1)
+		sort.Float64s(p2.Data[i])
 		text += index + ": " + color(i+1) + "\n"
 		if i != len(output)-1 {
 		} else {
@@ -717,14 +721,16 @@ func scatterinit(x int, mainlist []map[string][]float64, columns []string, colum
 		}
 		i++
 	}
-	p2.SetRect(0, 0, 80, 30)
+	if lenitems > 160 {
+		lenitems = 160
+	}
+	p2.SetRect(0, 0, lenitems, 30)
+	p3.SetRect(lenitems, 0, lenitems+20, 30)
 	p2.AxesColor = ui.ColorWhite
 	p2.PlotType = widgets.ScatterPlot
 	p2.Title = columns[x] + " for different " + column
-	p3 := widgets.NewParagraph()
 	p3.Text = text
 	p3.Border = false
-	p3.SetRect(80, 0, 100, 30)
 	p3.TextStyle.Fg = ui.ColorBlue
 	ui.Render(p2, p3)
 }
