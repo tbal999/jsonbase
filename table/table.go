@@ -768,7 +768,7 @@ func (t Table) stats(x []float64) ([]float64, []float64) {
 	return minout, maxout
 }
 
-func (t Table) Scatterplot(column string) {
+func (t Table) Plot(column string) {
 	mainlist := []map[string][]float64{}
 	columns := []string{}
 	for index := range t.Columns {
