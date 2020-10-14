@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 	"unicode"
+	"math/rand"
 
 	ui "github.com/gizak/termui/v3"              //for scatterplots
 	widgets "github.com/gizak/termui/v3/widgets" //for scatterplots
@@ -696,6 +697,38 @@ func (t Table) stats(x []float64) ([]float64, []float64) {
 	return minout, maxout
 }
 
+func samplerate(x []float64) []float64 {
+	sample := []float64{}
+	var lowerquartile float64
+	var upperquartile float64
+	lNumberf :=  math.Floor(0.25 * float64(len(x)))
+	lNumber := int(lNumberf)
+	uNumberf :=  math.Floor(0.75 * float64(len(x)))
+	uNumber := int(uNumberf)
+	if len(x) % 2 == 0 {
+		upperquartile =  (x[uNumber-1] + x[uNumber]) / 2
+		lowerquartile = (x[lNumber-1] + x[lNumber]) / 2
+	} else {
+		upperquartile = x[uNumber]
+		lowerquartile =  x[lNumber]
+	}
+	interquartile := upperquartile-lowerquartile
+	min := lowerquartile - 1.5*interquartile
+	max := upperquartile + 1.5*interquartile
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	counter := 0
+	for _, i := range r.Perm(len(x)) {
+		if counter > 155 {
+			break
+		}
+		if x[i] >= min && x[i] <= max {
+			sample = append(sample, x[i])
+			counter++
+		}
+	}
+	return sample
+}
+
 func scatterinit(x int, mainlist []map[string][]float64, columns []string, column string) {
 	p2 := widgets.NewPlot()
 	p3 := widgets.NewParagraph()
@@ -704,10 +737,12 @@ func scatterinit(x int, mainlist []map[string][]float64, columns []string, colum
 	p2.Data = make([][]float64, len(output))
 	var i = 0
 	var text = "Key: \n"
-	var lenitems = 0
+	length := 0
 	for index, plotdata := range output {
 		p2.Data[i] = plotdata
-		lenitems = int(len(plotdata)+1)
+		if len(plotdata)+1 > 155 {
+			p2.Data[i] = samplerate(p2.Data[i])
+		}
 		sort.Float64s(p2.Data[i])
 		text += index + ": " + color(i+1) + "\n"
 		if i != len(output)-1 {
@@ -719,13 +754,11 @@ func scatterinit(x int, mainlist []map[string][]float64, columns []string, colum
 			press a and d to
 			change field`
 		}
+		length = len(p2.Data[i])
 		i++
 	}
-	if lenitems > 160 {
-		lenitems = 160
-	}
-	p2.SetRect(0, 0, lenitems, 30)
-	p3.SetRect(lenitems, 0, lenitems+20, 30)
+	p2.SetRect(0, 0, length, 30)
+	p3.SetRect(length, 0, length+20, 30)
 	p2.AxesColor = ui.ColorWhite
 	p2.PlotType = widgets.ScatterPlot
 	p2.Title = columns[x] + " for different " + column
