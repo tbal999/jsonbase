@@ -595,7 +595,7 @@ func (t Table) Join(t2 Table, tcolumn, t2column string) [][]string {
 				}
 			}
 			if abool == false {
-				var null = []string{"NULL-DATA"}
+				var null = []string{"<-NULL->"}
 				output = append(output, join2D(t.Rows[yindex], null))
 			}
 		}
@@ -628,6 +628,7 @@ func (t Table) Describe(column string) {
 				t.Focusdata(column,t.Columns[index2]) 
 		}
 	}
+	fmt.Println("Consider removing outliers from source data")
 }
 
 func (t Table) Grabdata(identifiercolumn string) (names []string, data [][]float64) {
@@ -649,7 +650,23 @@ func (t Table) Grabdata(identifiercolumn string) (names []string, data [][]float
 	return names, data
 }
 
-func (t Table) Stats(x []float64) ([]float64, []float64) {
+func (t Table) Focusdata(column1, column2 string ) {
+	output := t.collectdata(column1,column2)
+	var item string
+	list := []float64{}
+	for index, plotdata := range output {
+		item = index
+		list = plotdata
+		fmt.Println("For: "+item+" - column: " +column2)
+		sort.Float64s(list)
+		minoutliers, maxoutliers := t.stats(list)
+		fmt.Printf("Min outliers: %f\n", minoutliers)
+		fmt.Printf("Max outliers: %f\n", maxoutliers)
+		fmt.Println("")
+	}
+}
+
+func (t Table) stats(x []float64) ([]float64, []float64) {
 	minout := []float64{}
 	maxout := []float64{}
 	var lowerquartile float64
@@ -679,59 +696,76 @@ func (t Table) Stats(x []float64) ([]float64, []float64) {
 	return minout, maxout
 }
 
-func (t Table) Focusdata(column1, column2 string ) {
-	output := t.collectdata(column1,column2)
-	var item string
-	list := []float64{}
-	for index, plotdata := range output {
-		item = index
-		list = plotdata
-		fmt.Println("For: "+item+" - column: " +column2)
-		sort.Float64s(list)
-		minoutliers, maxoutliers := t.Stats(list)
-		fmt.Printf("Min outliers: %f\n", minoutliers)
-		fmt.Printf("Max outliers: %f\n", maxoutliers)
-		fmt.Println("")
-	}
-}
-
-func (t Table) Scatterplot(column, column2 string) {
-	output := t.collectdata(column,column2)
-	if err := ui.Init(); err != nil {
-		fmt.Println("Error generating plot")
-		return
-	}
-	defer ui.Close()
+func scatterinit(x int, mainlist []map[string][]float64, columns []string, column string) {
 	p2 := widgets.NewPlot()
 	p2.Marker = widgets.MarkerDot
+	output := mainlist[x]
 	p2.Data = make([][]float64, len(output))
 	var i = 0
-	var text = "Key: "
+	var text = "Key: \n"
 	for index, plotdata := range output {
 		p2.Data[i] = plotdata
-		text += index + "-" + color(i+1)
+		text += index + ": " + color(i+1) + "\n"
 		if i != len(output)-1 {
-			text += ", "
 		} else {
-			text += " (press q to quit)"
+			text += `
+			
+			Instructions: 
+			press q to quit
+			press a and d to
+			change field`
 		}
 		i++
 	}
 	p2.SetRect(0, 0, 80, 30)
 	p2.AxesColor = ui.ColorWhite
 	p2.PlotType = widgets.ScatterPlot
-	p2.Title = column2 + " for different " + column
-	ui.Render(p2)
-	for i := 0; i < 29; i++ {
-		fmt.Printf("\n")
+	p2.Title = columns[x] + " for different " + column
+	p3 := widgets.NewParagraph()
+	p3.Text = text
+	p3.Border = false
+	p3.SetRect(80, 0, 100, 30)
+	p3.TextStyle.Fg = ui.ColorBlue
+	ui.Render(p2, p3)
+}
+
+func (t Table) Scatterplot(column string) {
+	mainlist := []map[string][]float64{}
+	columns := []string{}
+	for index := range t.Columns {
+		if t.Columns[index] != column {
+			output := t.collectdata(column,t.Columns[index])
+			columns = append(columns, t.Columns[index])
+			mainlist = append(mainlist, output)
+		}
 	}
-	fmt.Printf("%s", text)
+	if err := ui.Init(); err != nil {
+		fmt.Println("Error generating plot")
+		return
+	}
+	x := len(mainlist)-1
+	defer ui.Close()
+	scatterinit(1, mainlist, columns, column)
 	uiEvents := ui.PollEvents()
 	for {
 		e := <-uiEvents
 		switch e.ID {
 		case "q", "<C-c>":
 			return
+		case "a":
+			if x == 0 {
+				x = len(mainlist)-1
+			} else {
+				x--
+			}
+			scatterinit(x, mainlist, columns, column)
+		case "d":
+			if x == len(mainlist)-1 {
+				x = 0
+			} else {
+				x++
+			}
+			scatterinit(x, mainlist, columns, column)
 		}
 
 	}
