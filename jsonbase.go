@@ -465,8 +465,8 @@ func (d Database) Order(tablename, columnname string, order bool) {
 	}
 }
 
-//Scatterplot - pass a table, a column of items and a datacolumn for 1D scatter plot of all items.
-func (d Database) Scatterplot(table, namecolumnstring) {
+//Scatterplot - pass a table and a column for 1D scatter plot of all fields against the column items.
+func (d Database) Scatterplot(table, namecolumn string) {
 	if yes, index := d.verifytable(table); yes == true {
 		d.Table[index].Scatterplot(namecolumn)
 	}
