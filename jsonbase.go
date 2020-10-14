@@ -465,10 +465,10 @@ func (d Database) Order(tablename, columnname string, order bool) {
 	}
 }
 
-//Scatterplot - pass a table and a column for 1D scatter plot of all fields against the column items.
-func (d Database) Scatterplot(table, namecolumn string) {
+//Plot - pass a table and a column to generate a plot of all fields against the column items.
+func (d Database) Plot(table, namecolumn string) {
 	if yes, index := d.verifytable(table); yes == true {
-		d.Table[index].Scatterplot(namecolumn)
+		d.Table[index].Plot(namecolumn)
 	}
 }
 
