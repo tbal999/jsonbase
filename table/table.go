@@ -116,6 +116,77 @@ func remove1D(slice []string, s int) []string {
 	return slice
 }
 
+func samplerate(x []float64) []float64 {
+	sample := []float64{}
+	var lowerquartile float64
+	var upperquartile float64
+	lNumberf :=  math.Floor(0.25 * float64(len(x)))
+	lNumber := int(lNumberf)
+	uNumberf :=  math.Floor(0.75 * float64(len(x)))
+	uNumber := int(uNumberf)
+	if len(x) % 2 == 0 {
+		upperquartile =  (x[uNumber-1] + x[uNumber]) / 2
+		lowerquartile = (x[lNumber-1] + x[lNumber]) / 2
+	} else {
+		upperquartile = x[uNumber]
+		lowerquartile =  x[lNumber]
+	}
+	interquartile := upperquartile-lowerquartile
+	min := lowerquartile - 1.5*interquartile
+	max := upperquartile + 1.5*interquartile
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	counter := 0
+	for _, i := range r.Perm(len(x)) {
+		if counter > 155 {
+			break
+		}
+		if x[i] >= min && x[i] <= max {
+			sample = append(sample, x[i])
+			counter++
+		}
+	}
+	return sample
+}
+
+func scatterinit(x int, mainlist []map[string][]float64, columns []string, column string) {
+	p2 := widgets.NewPlot()
+	p3 := widgets.NewParagraph()
+	p2.Marker = widgets.MarkerDot
+	output := mainlist[x]
+	p2.Data = make([][]float64, len(output))
+	var i = 0
+	var text = "Key: \n"
+	length := 0
+	for index, plotdata := range output {
+		p2.Data[i] = plotdata
+		if len(plotdata)+1 > 155 {
+			p2.Data[i] = samplerate(p2.Data[i])
+		}
+		sort.Float64s(p2.Data[i])
+		text += index + ": " + color(i+1) + "\n"
+		if i != len(output)-1 {
+		} else {
+			text += `
+			
+			Instructions: 
+			press q to quit
+			press a and d to
+			change field`
+		}
+		length = len(p2.Data[i])
+		i++
+	}
+	p2.SetRect(0, 0, length, 30)
+	p3.SetRect(length, 0, length+20, 30)
+	p2.AxesColor = ui.ColorWhite
+	p2.PlotType = widgets.ScatterPlot
+	p2.Title = columns[x] + " for different " + column
+	p3.Text = text
+	p3.Border = false
+	p3.TextStyle.Fg = ui.ColorBlue
+	ui.Render(p2, p3)
+}
+
 func collate(main string, row, columns []string) [][]string {
 	output := [][]string{}
 	rowindex := 0
@@ -695,77 +766,6 @@ func (t Table) stats(x []float64) ([]float64, []float64) {
 		}
 	}
 	return minout, maxout
-}
-
-func samplerate(x []float64) []float64 {
-	sample := []float64{}
-	var lowerquartile float64
-	var upperquartile float64
-	lNumberf :=  math.Floor(0.25 * float64(len(x)))
-	lNumber := int(lNumberf)
-	uNumberf :=  math.Floor(0.75 * float64(len(x)))
-	uNumber := int(uNumberf)
-	if len(x) % 2 == 0 {
-		upperquartile =  (x[uNumber-1] + x[uNumber]) / 2
-		lowerquartile = (x[lNumber-1] + x[lNumber]) / 2
-	} else {
-		upperquartile = x[uNumber]
-		lowerquartile =  x[lNumber]
-	}
-	interquartile := upperquartile-lowerquartile
-	min := lowerquartile - 1.5*interquartile
-	max := upperquartile + 1.5*interquartile
-	r := rand.New(rand.NewSource(time.Now().Unix()))
-	counter := 0
-	for _, i := range r.Perm(len(x)) {
-		if counter > 155 {
-			break
-		}
-		if x[i] >= min && x[i] <= max {
-			sample = append(sample, x[i])
-			counter++
-		}
-	}
-	return sample
-}
-
-func scatterinit(x int, mainlist []map[string][]float64, columns []string, column string) {
-	p2 := widgets.NewPlot()
-	p3 := widgets.NewParagraph()
-	p2.Marker = widgets.MarkerDot
-	output := mainlist[x]
-	p2.Data = make([][]float64, len(output))
-	var i = 0
-	var text = "Key: \n"
-	length := 0
-	for index, plotdata := range output {
-		p2.Data[i] = plotdata
-		if len(plotdata)+1 > 155 {
-			p2.Data[i] = samplerate(p2.Data[i])
-		}
-		sort.Float64s(p2.Data[i])
-		text += index + ": " + color(i+1) + "\n"
-		if i != len(output)-1 {
-		} else {
-			text += `
-			
-			Instructions: 
-			press q to quit
-			press a and d to
-			change field`
-		}
-		length = len(p2.Data[i])
-		i++
-	}
-	p2.SetRect(0, 0, length, 30)
-	p3.SetRect(length, 0, length+20, 30)
-	p2.AxesColor = ui.ColorWhite
-	p2.PlotType = widgets.ScatterPlot
-	p2.Title = columns[x] + " for different " + column
-	p3.Text = text
-	p3.Border = false
-	p3.TextStyle.Fg = ui.ColorBlue
-	ui.Render(p2, p3)
 }
 
 func (t Table) Scatterplot(column string) {
