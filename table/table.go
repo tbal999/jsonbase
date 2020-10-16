@@ -382,7 +382,6 @@ func (t Table) meanall(column int) (float64, float64) {
 	return mean, math.Sqrt(variance) //standard deviation
 }
 
-//Normalize - normalises the data in a table.
 func (t *Table) Normalize() {
 	T := *t
 	for columnindex := range T.Columns {
@@ -408,8 +407,6 @@ func (t Table) verifycolumn(Column string) (int, bool) {
 	return 0, false
 }
 
-//Sum lets you count sum of total in a column of integers
-//Passes to Buffer
 func (t Table) Sum(column string) [][]string {
 	var sum float64
 	output := [][]string{}
@@ -447,9 +444,6 @@ func (t Table) Regex(column, regexquery string, boolean bool) [][]string {
 	return nil
 }
 
-//RegexReplace lets you replace substrings in strings with new string for rows that match a Regex.
-//Directly affects table
-//Afterwards you will need to Grab the table.
 func (t *Table) RegexReplace(column, regexquery, oldstring, newstring string) {
 	T := *t
 	output := [][]string{}
