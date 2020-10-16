@@ -466,6 +466,7 @@ func (d Database) Order(tablename, columnname string, order bool) {
 }
 
 //Plot - pass a table and a column to generate a plot of all fields against the column items.
+//Max sample size is 155 - if one item has more than 155 samples it will display only a sample of the dataset.
 func (d Database) Plot(table, namecolumn string) {
 	if yes, index := d.verifytable(table); yes == true {
 		d.Table[index].Plot(namecolumn)
