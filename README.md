@@ -6,6 +6,7 @@ I aim to make it as easy to use as possible & plan to extend on this and make it
 
 Docs: https://pkg.go.dev/github.com/tbal999/jsonbase
 
+![Demo](https://raw.githubusercontent.com/tbal999/jsonbase/main/app-example/example.gif)
 
 What can you do with it?
 
