@@ -63,6 +63,6 @@ What can you do with it?
 ## Machine learning / stats
 - You can describe a dataset on a specific column via 'Describe()'
 - You can plot scatterplots (making use of termui library)
-- You can use KNN machine learning algorithm i built - bruteforce algorithm only so smaller datasets atm only.
+- You can use KNN machine learning algorithm - bruteforce algorithm only atm so smaller datasets only.
 
 Using a combination of the above, and the buffer, you can perform a lot of tasks.
