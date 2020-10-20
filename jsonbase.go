@@ -545,7 +545,7 @@ func (d Database) Describe(table, dependentcolumn string) {
 }
 
 //Columns returns a string array of the columns in a specific table 
-//Used for when you want to do adjustments on multiple columns quickly i.e remove whitespaces via a loop
+//Used for when you want to do adjustments on each column via a loop
 func (d Database) Columns(table string) []string {
 	if yes, index := d.verifytable(table); yes == true {
 		return d.Table[index].Columns
