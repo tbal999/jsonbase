@@ -61,7 +61,7 @@ What can you do with it?
 - For example you could remove unnecessary whitespace from every single column.
 
 ## ML / stats
-- You can describe a dataset on a specific column via 'Describe()'
+- You can describe a dataset on a specific column via 'Describe()' (gives you average / standard deviation for each item in a column)
 - You can plot scatterplots (making use of termui library)
 - You can use KNN machine learning algorithm - bruteforce algorithm only atm so smaller datasets only.
 
