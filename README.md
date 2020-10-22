@@ -60,7 +60,7 @@ What can you do with it?
 - You can grab the columns of a table and then pass a single column query through all columns.
 - For example you could remove unnecessary whitespace from every single column.
 
-## Machine learning / stats
+## ML / stats
 - You can describe a dataset on a specific column via 'Describe()'
 - You can plot scatterplots (making use of termui library)
 - You can use KNN machine learning algorithm - bruteforce algorithm only atm so smaller datasets only.
