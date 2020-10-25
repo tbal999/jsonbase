@@ -7,7 +7,7 @@ I aim to make it as easy to use as possible & plan to extend on this and make it
 Docs: https://pkg.go.dev/github.com/tbal999/jsonbase
 
 Below is an example of it being used as a simple console application.
-![Demo](https://raw.githubusercontent.com/tbal999/jsonbase/main/app-example/example.gif)
+![Demo](https://raw.githubusercontent.com/tbal999/jsonbase/main/app-example/console-example.gif)
 
 What can you do with it?
 
