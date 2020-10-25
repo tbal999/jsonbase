@@ -183,7 +183,7 @@ func scatterinit(x int, mainlist []map[string][]float64, columns []string, colum
 	p2.Title = columns[x] + " for different " + column
 	p3.Text = text
 	p3.Border = false
-	p3.TextStyle.Fg = ui.ColorBlue
+	p3.TextStyle.Fg = ui.ColorWhite
 	ui.Render(p2, p3)
 }
 
