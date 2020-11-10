@@ -37,6 +37,9 @@ What can you do with it?
 ## Unpivot
 - You can unpivot data.
 
+## Normalize
+- You can normalize a set of data.
+
 ## Add Index
 - You can add an index to the item.
 
