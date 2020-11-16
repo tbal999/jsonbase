@@ -16,7 +16,7 @@ What can you do with it?
 
 ## Use Buffer
 - Most of the queries get passed to a buffer table, which you print out via 'Print()'.
-- In between transformations, you can save the buffer as a new table, and do further transformations. It's like a temperory table in SQL.
+- In between transformations, you can save the buffer as a new table, and do further transformations. It's like a temporary table in SQL.
 - You could join one table to another, save this output, then join the output to another table etc etc.
 
 ## Sum
