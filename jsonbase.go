@@ -98,7 +98,7 @@ func (d *Database) ImportFile(filename, tablename, delimiter string, header bool
 		if header == false {
 			head := ""
 			for x := 0; x < len(Table.Rows[0]); x++ {
-				head += "COLUM1" + strconv.Itoa(x)
+				head += "COLUMN" + strconv.Itoa(x)
 				if x != len(Table.Rows[0])-1 {
 					head += ","
 				}
