@@ -4,6 +4,10 @@ minimalistic declarative data manipulation library developed 27th Sep onwards.
 The idea of this tool is that you can do very specific data manipulation in go.
 I aim to make it as easy to use as possible & plan to extend on this and make it more useful over time.
 
+Advantages:
+Faster than Pandas (for most things).
+Intuitive simple docs.
+
 Docs: https://pkg.go.dev/github.com/tbal999/jsonbase
 
 Below is an example of it being used as a simple console application.
