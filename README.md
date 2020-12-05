@@ -5,7 +5,7 @@ The idea of this tool is that you can do very specific data manipulation in go.
 I aim to make it as easy to use as possible & plan to extend on this and make it more useful over time.
 
 Advantages:
-Faster than Pandas (for most things).
+Faster than Pandas (for most things that this tool can do).
 Intuitive simple docs.
 
 Docs: https://pkg.go.dev/github.com/tbal999/jsonbase
