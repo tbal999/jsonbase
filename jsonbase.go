@@ -259,6 +259,22 @@ func (d Database) Print(clear bool, howmany int) {
 	}
 }
 
+//Transpose flips the Temptable so columns are rows and rows are columns.
+func (d Database) Transpose() {
+    xl := len(Temptable[0])
+    yl := len(Temptable)
+    result := make([][]string, xl)
+    for i := range result {
+        result[i] = make([]string, yl)
+    }
+    for i := 0; i < xl; i++ {
+        for j := 0; j < yl; j++ {
+            result[i][j] = Temptable[j][i]
+        }
+    }
+    Temptable = result
+}
+
 //SaveBuffer lets you save the current Temptable as a jsonbase table - name is the name of the table, howmany is how many rows you want to save
 //clear is whether you want to clear the buffer after you've saved it.
 func (d *Database) SaveBuffer(name string, howmany int, clear bool) {
