@@ -7,6 +7,8 @@ import (
 	"strconv"
 
 	"github.com/cheggaaa/pb"
+	"gonum.org/v1/gonum/mat"
+	"gonum.org/v1/gonum/stat/distuv"
 )
 
 //BRUTE FORCE KNN ALGORITHM
