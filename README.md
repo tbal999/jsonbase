@@ -71,6 +71,6 @@ What can you do with it?
 - You can describe a dataset on a specific column via 'Describe()' (gives you average / standard deviation for each item in a column)
 - You can plot scatterplots (making use of termui library)
 - You can use KNN machine learning algorithm - bruteforce algorithm only atm so smaller datasets only.
-- For larger datasets you can use neural network via NNtrain and NNpredict.
+- For larger datasets you can use artificial neural network via NNtrain and NNpredict.
 
 Using a combination of the above alongside the buffer, you can perform a lot of tasks.
