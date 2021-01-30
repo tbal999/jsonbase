@@ -298,7 +298,6 @@ func (net *Network) Train(training [][]float64, trainingname []string, epochcoun
 	t1 := time.Now()
 	bar := pb.StartNew(epochcount)
 	for epochs := 0; epochs < epochcount; epochs++ {
-		bar.Increment()
 			for index := range training {
 				traindata := training[index]
 				targets := make([]float64, net.outputs)
@@ -312,6 +311,7 @@ func (net *Network) Train(training [][]float64, trainingname []string, epochcoun
 				targets[tmap[trainingname[index]]] = 0.999
 				net.train(inputss, targets)
 			}
+		bar.Increment()
 		}
 	bar.Finish()
 	elapsed := time.Since(t1)
