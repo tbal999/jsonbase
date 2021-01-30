@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-//Database is a struct that stores all tables.
+//Database is a struct that stores all tables and one neural network (if you want to save and use ANN later on)
 type Database struct {
 	Table []table.Table
 	Net models.Network
