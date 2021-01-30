@@ -21,6 +21,7 @@ import (
 //Database is a struct that stores all tables.
 type Database struct {
 	Table []table.Table
+	Net models.Network
 }
 
 //Temptable is the internal buffer for storing any queries - printable via 'Output' function.
@@ -671,15 +672,31 @@ func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knum
 	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, false, true)
 }
 
+func outputcount(names []string) int {
+	trainmap := make(map[string]int)
+	iter := 0
+	for index := range names {
+		_, ok := trainmap[names[index]]
+		if ok {
+			continue
+		} else {
+			trainmap[names[index]] = iter
+			iter++
+		}
+	}
+	return iter
+}
+
 //NNtrain train a neural network using a training table.
-//Need to provide training table, identifier column as well as number of inputs, how many hidden & how many outputs as well as learning rate & epoch number.
-func (d *Database) NNtrain(trainingtable, identifiercolumn string, inputs, hidden, outputs, epochs int, learningrate float64) {
-	d.Net = models.CreateNN(inputs, hidden, outputs, learningrate)
+//Need to provide training table, identifier column as well as number of hidden weights, epochs and learning rate.
+//No need to provide number of inputs and outputs - this is calculated automatically to save troubles.
+func (d *Database) NNtrain(trainingtable, identifiercolumn string, hidden, epochs int, learningrate float64) {
 	var trainingdata [][]float64
 	var trainingname []string
 	fmt.Println("Importing data...")
 	if yes, table1index := d.verifytable(trainingtable); yes == true {
 		trainingname, trainingdata = d.Table[table1index].Grabdata(identifiercolumn)
+		d.Net = models.CreateNN(len(trainingdata[0]), hidden, outputcount(trainingname), learningrate)
 	}
 	fmt.Println("Training NN...")
 	d.Net.Train(trainingdata, trainingname, epochs)
