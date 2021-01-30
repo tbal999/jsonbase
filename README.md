@@ -7,6 +7,7 @@ I aim to make it as easy to use as possible & plan to extend on this and make it
 Advantages:
 Faster than Pandas (for most things that this tool can do).
 Intuitive simple docs.
+Does more i.e KNN and ANN prediction.
 
 Docs: https://pkg.go.dev/github.com/tbal999/jsonbase
 
