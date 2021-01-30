@@ -1,5 +1,5 @@
 # jsonbase
-minimalistic declarative data manipulation library developed 27th Sep onwards.
+minimalistic declarative data manipulation library developed 27th Sep onwards. Primary reason for writing this was to learn more about data engineering.
 
 The idea of this tool is that you can do very specific data manipulation in go.
 I aim to make it as easy to use as possible & plan to extend on this and make it more useful over time.
