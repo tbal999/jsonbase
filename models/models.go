@@ -13,7 +13,7 @@ import (
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
-//BRUTE FORCE KNN ALGORITHM
+//BRUTE FORCE KNN ALGORITHM & helper FUNCTIONS ////////////////////////////////////////////////////////////////////////
 
 func squareDistance(features1, features2 []float64) float64 {
 	var d float64
@@ -123,7 +123,7 @@ func KNN(training, testing [][]float64, trainingname, testingname []string, k in
 	return nil
 }
 
-
+//ANN & helper FUNCTIONS ////////////////////////////////////////////////////////////////////////
 //3 LAYER NEURAL NETWORK MODEL - initial code courtesy of ---> github.com/sausheong/gonn
 //I have added multiple layers of functionality to make it avaialble to all sorts of custom datasets.
 type Network struct {
