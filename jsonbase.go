@@ -43,6 +43,22 @@ func grabsubstring(x string) (string, string) {
 	return "", strings.Split(x, "[")[0]
 }
 
+
+func outputcount(names []string) int {
+	trainmap := make(map[string]int)
+	iter := 0
+	for index := range names {
+		_, ok := trainmap[names[index]]
+		if ok {
+			continue
+		} else {
+			trainmap[names[index]] = iter
+			iter++
+		}
+	}
+	return iter
+}
+
 /////////////////////      HELPER FUNCTIONS  /////////////////////////////
 
 //checks if table exists in database
@@ -670,21 +686,6 @@ func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knum
 	}
 	fmt.Println("KNN regression - processing...")
 	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, false, true)
-}
-
-func outputcount(names []string) int {
-	trainmap := make(map[string]int)
-	iter := 0
-	for index := range names {
-		_, ok := trainmap[names[index]]
-		if ok {
-			continue
-		} else {
-			trainmap[names[index]] = iter
-			iter++
-		}
-	}
-	return iter
 }
 
 //NNtrain train a neural network using a training table.
