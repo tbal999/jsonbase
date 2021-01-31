@@ -293,10 +293,12 @@ func (net *Network) targets(names []string) map[string]int {
 }
 
 func (net *Network) Train(training [][]float64, trainingname []string, epochcount int) {
+	var currentstate float64
+	var prevstate float64
 	tmap := net.targets(trainingname)
 	rand.Seed(time.Now().UTC().UnixNano())
 	t1 := time.Now()
-	bar := pb.StartNew(epochcount)
+	//dbar := pb.StartNew(epochcount)
 	for epochs := 0; epochs < epochcount; epochs++ {
 			for index := range training {
 				traindata := training[index]
@@ -311,11 +313,45 @@ func (net *Network) Train(training [][]float64, trainingname []string, epochcoun
 				targets[tmap[trainingname[index]]] = 0.999
 				net.train(inputss, targets)
 			}
-		bar.Increment()
+		//bar.Increment()
+		if epochs == 0 {
+			prevstate = net.predicttrain(training, trainingname)
+		} else {
+			currentstate = net.predicttrain(training, trainingname)
+			s1 := fmt.Sprintf("%.2f", currentstate)
+			s2 := fmt.Sprintf("%.2f", prevstate)
+			if s1 != s2 {
+				fmt.Printf("Epoch: %d, Accuracy: %s\n", epochs, s1)
+				prevstate = currentstate
+			}
 		}
-	bar.Finish()
+		}
+	//bar.Finish()
 	elapsed := time.Since(t1)
 	fmt.Printf("\nTime taken to train: %s\n", elapsed)
+}
+
+func (net *Network) predicttrain(training [][]float64, trainingname []string) float64 {
+	score := 0
+	for index := range training {
+		inputss := make([]float64, net.inputs)
+		for i := range inputss {
+			inputss[i] = (training[index][i] / 255.0 * 0.999) + 0.001
+		}
+		outputs := net.predict(inputss)
+		best := 0
+		highest := 0.0
+		for i := 0; i < net.outputs; i++ {
+			if outputs.At(i, 0) > highest {
+				best = i
+				highest = outputs.At(i, 0)
+			}
+		}
+		if net.targetmap[best] == trainingname[index] {
+			score++
+		}
+	}
+	return float64(score)/float64(len(trainingname)-1)
 }
 
 func (net *Network) Predict(training [][]float64) [][]string {
