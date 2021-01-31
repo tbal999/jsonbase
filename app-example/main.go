@@ -183,6 +183,15 @@ func main() {
 			} else {
 				fmt.Println("usage: knnreg traintable testtable column knumber")
 			}
+		/*case "nntrain":
+			if len(switchy) == 6 {
+				inputs, _ := strconv.Atoi(switchy[4])
+				epochs, _ := strconv.Atoi(switchy[4])
+				learnrate, _ := strconv.Atoi(switchy[4])
+				d.NNtrain(switchy[1], switchy[2], switchy[3], knumber)
+			} else {
+				fmt.Println("usage: nntrain traintable column inputs epochs learningrate")
+			}*/
 		}
 	}
 }
