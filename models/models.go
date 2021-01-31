@@ -318,7 +318,7 @@ func (net *Network) Train(training [][]float64, trainingname []string, epochcoun
 	fmt.Printf("\nTime taken to train: %s\n", elapsed)
 }
 
-func (net *Network) Predict(training [][]float64, trainingname []string) [][]string {
+func (net *Network) Predict(training [][]float64) [][]string {
 	output := [][]string{}
 	Headers := []string{"INDEX", "PREDICTION"}
 	output = append(output, Headers)
@@ -341,4 +341,3 @@ func (net *Network) Predict(training [][]float64, trainingname []string) [][]str
 	}
 	return output
 }
-
