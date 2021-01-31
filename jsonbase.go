@@ -688,7 +688,7 @@ func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knum
 	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, false, true)
 }
 
-//NNtrain train a neural network using a training table.
+//NNtrain train a 2-layer neural network using a training table.
 //Need to provide training table, identifier column as well as number of hidden weights, epochs and learning rate.
 //No need to provide number of inputs and outputs - this is calculated automatically to save troubles.
 func (d *Database) NNtrain(trainingtable, identifiercolumn string, hidden, epochs int, learningrate float64) {
@@ -704,13 +704,12 @@ func (d *Database) NNtrain(trainingtable, identifiercolumn string, hidden, epoch
 }
 
 //NNpredict use a trained neural network to predict another dataset, passing the table & identifier column.
-func (d Database) NNpredict(trainingtable, identifiercolumn string) {
+func (d Database) NNpredict(trainingtable string) {
 	var trainingdata [][]float64
-	var trainingname []string
 	fmt.Println("Importing data...")
 	if yes, table1index := d.verifytable(trainingtable); yes == true {
-		trainingname, trainingdata = d.Table[table1index].Grabdata(identifiercolumn)
+		trainingdata = d.Table[table1index].Grabdatatest()
 	}
 	fmt.Println("Predicting...")
-	Temptable = d.Net.Predict(trainingdata, trainingname)
+	Temptable = d.Net.Predict(trainingdata)
 }
