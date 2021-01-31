@@ -408,6 +408,18 @@ func (d *Database) LoadDBase(filename string) {
 	item := *d
 	jsonFile, _ := ioutil.ReadFile(filename + ".json")
 	_ = json.Unmarshal([]byte(jsonFile), &item)
+	h, err := os.Open(filename+".hnn")
+	defer h.Close()
+	if err == nil {
+		item.Net.HiddenWeights.Reset()
+		item.Net.HiddenWeights.UnmarshalBinaryFrom(h)
+	}
+	o, err := os.Open(filename+".onn")
+	defer o.Close()
+	if err == nil {
+		item.Net.OutputWeights.Reset()
+		item.Net.OutputWeights.UnmarshalBinaryFrom(o)
+	}
 	*d = item
 	fmt.Println("Loaded " + filename + "!")
 }
@@ -421,8 +433,20 @@ func (d Database) SaveDBase(filename string) {
 		return
 	}
 	_ = ioutil.WriteFile(filename+".json", output, 0755)
+	h, err := os.Create(filename+".hnn")
+	defer h.Close()
+	if err == nil {
+		Base.Net.HiddenWeights.MarshalBinaryTo(h)
+	}
+	o, err := os.Create(filename+".onn")
+	defer o.Close()
+	if err == nil {
+		Base.Net.OutputWeights.MarshalBinaryTo(o)
+	}
 	fmt.Println("Saved " + filename + "!")
 }
+
+
 
 //Regex lets you grab a table where items within a column match a regular expression that you can pass in
 //to the function and pulls whether they do or don't match (true/false)
@@ -700,7 +724,7 @@ func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knum
 	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, false, true)
 }
 
-//NNtrain train a 2-layer neural network using a training table.
+//NNtrain train a neural network using a training table.
 //Need to provide training table, identifier column as well as number of hidden weights, epochs and learning rate.
 //No need to provide number of inputs and outputs - this is calculated automatically to save troubles.
 func (d *Database) NNtrain(trainingtable, identifiercolumn string, hidden, epochs int, learningrate float64) {
