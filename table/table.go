@@ -697,6 +697,18 @@ func (t Table) Describe(column string) {
 	fmt.Println("Consider removing outliers from source data")
 }
 
+func (t Table) Grabdatatest() (data [][]float64) {
+		for index := range t.Rows {
+			item := []float64{}
+			for columnindex := range t.Rows[index] {
+					x, _ := strconv.ParseFloat(t.Rows[index][columnindex], 64)
+					item = append(item, x)
+			}
+			data = append(data, item)
+		}
+	return data
+}
+
 func (t Table) Grabdata(identifiercolumn string) (names []string, data [][]float64) {
 	column1index, real := t.verifycolumn(identifiercolumn)
 	if real == true {
