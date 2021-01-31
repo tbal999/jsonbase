@@ -380,3 +380,4 @@ func (net *Network) Predict(training [][]float64) [][]string {
 		output = append(output, row)
 	}
 	return output
+}
