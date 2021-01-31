@@ -255,15 +255,27 @@ func (d Database) Print(clear bool, howmany int) {
 	if len(Temptable) == 0 {
 		fmt.Println("No results.")
 	}
+	collength := len(Temptable[0])
+	diff := strconv.Itoa(collength-8)
 	if howmany == 0 {
 		for index := range Temptable {
-			out := strings.Join(Temptable[index], "\t")
-			fmt.Fprintln(w, out)
+			if collength <= 8 {
+				out := strings.Join(Temptable[index], "\t")
+				fmt.Fprintln(w, out)
+			} else {
+				out := strings.Join(Temptable[index][0:4], "\t") + "\t"+diff+ " cols skipped"+"\t" + strings.Join(Temptable[index][collength-4:collength], "\t")
+				fmt.Fprintln(w, out)
+			}
 		}
 	} else {
 		for index := range Temptable {
-			out := strings.Join(Temptable[index], "\t")
-			fmt.Fprintln(w, out)
+			if collength <= 8 {
+				out := strings.Join(Temptable[index], "\t")
+				fmt.Fprintln(w, out)
+			} else {
+				out := strings.Join(Temptable[index][0:4], "\t") + "\t"+diff+ " cols skipped"+"\t" + strings.Join(Temptable[index][collength-4:collength], "\t")
+				fmt.Fprintln(w, out)
+			}
 			max++
 			if max > howmany {
 				break
