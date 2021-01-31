@@ -127,54 +127,54 @@ func KNN(training, testing [][]float64, trainingname, testingname []string, k in
 //3 LAYER NEURAL NETWORK MODEL - initial code courtesy of ---> github.com/sausheong/gonn
 //I have added multiple layers of functionality to make it avaialble to all sorts of custom datasets.
 type Network struct {
-	inputs        int
-	hiddens       int
-	outputs       int
-	hiddenWeights *mat.Dense
-	outputWeights *mat.Dense
-	learningRate  float64
-	targetmap map[int]string
+	Inputs        int
+	Hiddens       int
+	Outputs       int
+	HiddenWeights *mat.Dense
+	OutputWeights *mat.Dense
+	LearningRate  float64
+	Targetmap map[int]string
 }
 
 func CreateNN(input, hidden, output int, rate float64) (net Network) {
 	net = Network{
-		inputs:       input,
-		hiddens:      hidden,
-		outputs:      output,
-		learningRate: rate,
+		Inputs:       input,
+		Hiddens:      hidden,
+		Outputs:      output,
+		LearningRate: rate,
 	}
-	net.hiddenWeights = mat.NewDense(net.hiddens, net.inputs, randomArray(net.inputs*net.hiddens, float64(net.inputs)))
-	net.outputWeights = mat.NewDense(net.outputs, net.hiddens, randomArray(net.hiddens*net.outputs, float64(net.hiddens)))
+	net.HiddenWeights = mat.NewDense(net.Hiddens, net.Inputs, randomArray(net.Inputs*net.Hiddens, float64(net.Inputs)))
+	net.OutputWeights = mat.NewDense(net.Outputs, net.Hiddens, randomArray(net.Hiddens*net.Outputs, float64(net.Hiddens)))
 	return
 }
 
 func (net *Network) train(inputData []float64, targetData []float64) {
 	inputs := mat.NewDense(len(inputData), 1, inputData)
-	hiddenInputs := dot(net.hiddenWeights, inputs)
-	hiddenOutputs := apply(sigmoid, hiddenInputs)
-	finalInputs := dot(net.outputWeights, hiddenOutputs)
+	HiddenInputs := dot(net.HiddenWeights, inputs)
+	HiddenOutputs := apply(sigmoid, HiddenInputs)
+	finalInputs := dot(net.OutputWeights, HiddenOutputs)
 	finalOutputs := apply(sigmoid, finalInputs)
 
 	targets := mat.NewDense(len(targetData), 1, targetData)
 	outputErrors := subtract(targets, finalOutputs)
-	hiddenErrors := dot(net.outputWeights.T(), outputErrors)
+	hiddenErrors := dot(net.OutputWeights.T(), outputErrors)
 
-	net.outputWeights = add(net.outputWeights,
-		scale(net.learningRate,
+	net.OutputWeights = add(net.OutputWeights,
+		scale(net.LearningRate,
 			dot(multiply(outputErrors, sigmoidPrime(finalOutputs)),
-				hiddenOutputs.T()))).(*mat.Dense)
+				HiddenOutputs.T()))).(*mat.Dense)
 
-	net.hiddenWeights = add(net.hiddenWeights,
-		scale(net.learningRate,
-			dot(multiply(hiddenErrors, sigmoidPrime(hiddenOutputs)),
+	net.HiddenWeights = add(net.HiddenWeights,
+		scale(net.LearningRate,
+			dot(multiply(hiddenErrors, sigmoidPrime(HiddenOutputs)),
 				inputs.T()))).(*mat.Dense)
 }
 
 func (net Network) predict(inputData []float64) mat.Matrix {
 	inputs := mat.NewDense(len(inputData), 1, inputData)
-	hiddenInputs := dot(net.hiddenWeights, inputs)
-	hiddenOutputs := apply(sigmoid, hiddenInputs)
-	finalInputs := dot(net.outputWeights, hiddenOutputs)
+	HiddenInputs := dot(net.HiddenWeights, inputs)
+	HiddenOutputs := apply(sigmoid, HiddenInputs)
+	finalInputs := dot(net.OutputWeights, HiddenOutputs)
 	finalOutputs := apply(sigmoid, finalInputs)
 	return finalOutputs
 }
@@ -277,7 +277,7 @@ func addBiasNodeTo(m mat.Matrix, b float64) mat.Matrix {
 
 func (net *Network) targets(names []string) map[string]int {
 	trainmap := make(map[string]int)
-	net.targetmap = make(map[int]string)
+	net.Targetmap = make(map[int]string)
 	iter := 0
 	for index := range names {
 		_, ok := trainmap[names[index]]
@@ -285,25 +285,26 @@ func (net *Network) targets(names []string) map[string]int {
 			continue
 		} else {
 			trainmap[names[index]] = iter
-			net.targetmap[iter] = names[index]
+			net.Targetmap[iter] = names[index]
 			iter++
 		}
 	}
 	return trainmap
 }
 
-func (net *Network) Train(training [][]float64, trainingname []string, epochcount int) {
+func (n *Network) Train(training [][]float64, trainingname []string, epochcount int) {
 	var currentstate float64
 	var prevstate float64
+	net := *n
 	tmap := net.targets(trainingname)
 	rand.Seed(time.Now().UTC().UnixNano())
 	t1 := time.Now()
-	//dbar := pb.StartNew(epochcount)
+	bar := pb.StartNew(epochcount)
 	for epochs := 0; epochs < epochcount; epochs++ {
 			for index := range training {
 				traindata := training[index]
-				targets := make([]float64, net.outputs)
-				inputss := make([]float64, net.inputs)
+				targets := make([]float64, net.Outputs)
+				inputss := make([]float64, net.Inputs)
 				for i := range targets {
 						targets[i] = 0.001
 				}
@@ -313,41 +314,44 @@ func (net *Network) Train(training [][]float64, trainingname []string, epochcoun
 				targets[tmap[trainingname[index]]] = 0.999
 				net.train(inputss, targets)
 			}
-		//bar.Increment()
 		if epochs == 0 {
 			prevstate = net.predicttrain(training, trainingname)
+			s2 := fmt.Sprintf("%.2f", prevstate)
+			fmt.Printf("\nEpoch: %d, Accuracy: %s\n", epochs, s2)
 		} else {
 			currentstate = net.predicttrain(training, trainingname)
 			s1 := fmt.Sprintf("%.2f", currentstate)
 			s2 := fmt.Sprintf("%.2f", prevstate)
 			if s1 != s2 {
-				fmt.Printf("Epoch: %d, Accuracy: %s\n", epochs, s1)
+				fmt.Printf("\nEpoch: %d, Accuracy: %s\n", epochs, s1)
 				prevstate = currentstate
-			}
+			} 
 		}
+		bar.Increment()
 		}
-	//bar.Finish()
+	bar.Finish()
 	elapsed := time.Since(t1)
 	fmt.Printf("\nTime taken to train: %s\n", elapsed)
+	*n = net
 }
 
 func (net *Network) predicttrain(training [][]float64, trainingname []string) float64 {
 	score := 0
 	for index := range training {
-		inputss := make([]float64, net.inputs)
+		inputss := make([]float64, net.Inputs)
 		for i := range inputss {
 			inputss[i] = (training[index][i] / 255.0 * 0.999) + 0.001
 		}
 		outputs := net.predict(inputss)
 		best := 0
 		highest := 0.0
-		for i := 0; i < net.outputs; i++ {
+		for i := 0; i < net.Outputs; i++ {
 			if outputs.At(i, 0) > highest {
 				best = i
 				highest = outputs.At(i, 0)
 			}
 		}
-		if net.targetmap[best] == trainingname[index] {
+		if net.Targetmap[best] == trainingname[index] {
 			score++
 		}
 	}
@@ -359,21 +363,20 @@ func (net *Network) Predict(training [][]float64) [][]string {
 	Headers := []string{"INDEX", "PREDICTION"}
 	output = append(output, Headers)
 	for index := range training {
-		inputss := make([]float64, net.inputs)
+		inputss := make([]float64, net.Inputs)
 		for i := range inputss {
 			inputss[i] = (training[index][i] / 255.0 * 0.999) + 0.001
 		}
 		outputs := net.predict(inputss)
 		best := 0
 		highest := 0.0
-		for i := 0; i < net.outputs; i++ {
+		for i := 0; i < net.Outputs; i++ {
 			if outputs.At(i, 0) > highest {
 				best = i
 				highest = outputs.At(i, 0)
 			}
 		}
-		row := []string{strconv.Itoa(index),net.targetmap[best]} 
+		row := []string{strconv.Itoa(index),net.Targetmap[best]} 
 		output = append(output, row)
 	}
 	return output
-}
