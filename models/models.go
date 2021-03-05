@@ -15,19 +15,12 @@ import (
 
 //helper FUNCTIONS ////////////////////////////////////////////////////////////////////////
 
-func ccsquareDistance(features1, features2 []float64, name string, ch chan struct {
-	name   string
-	number float64
-}) {
+func squareDistance(features1, features2 []float64) float64 {
 	var d float64
 	for i := range features1 {
 		d += (features1[i] - features2[i]) * (features1[i] - features2[i])
 	}
-	new := struct {
-		name   string
-		number float64
-	}{name, d}
-	ch <- new
+	return math.Sqrt(d)
 }
 
 func calcaverage(items []float64) string {
