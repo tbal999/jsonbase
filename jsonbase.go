@@ -1,4 +1,4 @@
-package jsonbase
+package main
 
 import (
 	"encoding/csv"
@@ -6,22 +6,23 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"regexp"
-	models "github.com/tbal999/jsonbase/models"
-	table "github.com/tbal999/jsonbase/table"
 	"log"
 	"math/rand"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	models "github.com/tbal999/jsonbase/models"
+	table "github.com/tbal999/jsonbase/table"
 )
 
 //Database is a struct that stores all tables and one neural network (if you want to save and use ANN later on)
 type Database struct {
 	Table []table.Table
-	Net models.Network
+	Net   models.Network
 }
 
 //Temptable is the internal buffer for storing any queries - printable via 'Output' function.
@@ -42,7 +43,6 @@ func grabsubstring(x string) (string, string) {
 	}
 	return "", strings.Split(x, "[")[0]
 }
-
 
 func outputcount(names []string) int {
 	trainmap := make(map[string]int)
@@ -256,14 +256,14 @@ func (d Database) Print(clear bool, howmany int) {
 		fmt.Println("No results.")
 	}
 	collength := len(Temptable[0])
-	diff := strconv.Itoa(collength-8)
+	diff := strconv.Itoa(collength - 8)
 	if howmany == 0 {
 		for index := range Temptable {
 			if collength <= 8 {
 				out := strings.Join(Temptable[index], "\t")
 				fmt.Fprintln(w, out)
 			} else {
-				out := strings.Join(Temptable[index][0:4], "\t") + "\t"+diff+ " cols skipped"+"\t" + strings.Join(Temptable[index][collength-4:collength], "\t")
+				out := strings.Join(Temptable[index][0:4], "\t") + "\t" + diff + " cols skipped" + "\t" + strings.Join(Temptable[index][collength-4:collength], "\t")
 				fmt.Fprintln(w, out)
 			}
 		}
@@ -273,7 +273,7 @@ func (d Database) Print(clear bool, howmany int) {
 				out := strings.Join(Temptable[index], "\t")
 				fmt.Fprintln(w, out)
 			} else {
-				out := strings.Join(Temptable[index][0:4], "\t") + "\t"+diff+ " cols skipped"+"\t" + strings.Join(Temptable[index][collength-4:collength], "\t")
+				out := strings.Join(Temptable[index][0:4], "\t") + "\t" + diff + " cols skipped" + "\t" + strings.Join(Temptable[index][collength-4:collength], "\t")
 				fmt.Fprintln(w, out)
 			}
 			max++
@@ -290,18 +290,18 @@ func (d Database) Print(clear bool, howmany int) {
 
 //Transpose flips the Temptable so columns are rows and rows are columns.
 func (d Database) Transpose() {
-    xl := len(Temptable[0])
-    yl := len(Temptable)
-    result := make([][]string, xl)
-    for i := range result {
-        result[i] = make([]string, yl)
-    }
-    for i := 0; i < xl; i++ {
-        for j := 0; j < yl; j++ {
-            result[i][j] = Temptable[j][i]
-        }
-    }
-    Temptable = result
+	xl := len(Temptable[0])
+	yl := len(Temptable)
+	result := make([][]string, xl)
+	for i := range result {
+		result[i] = make([]string, yl)
+	}
+	for i := 0; i < xl; i++ {
+		for j := 0; j < yl; j++ {
+			result[i][j] = Temptable[j][i]
+		}
+	}
+	Temptable = result
 }
 
 //SaveBuffer lets you save the current Temptable as a jsonbase table - name is the name of the table, howmany is how many rows you want to save
@@ -408,13 +408,13 @@ func (d *Database) LoadDBase(filename string) {
 	item := *d
 	jsonFile, _ := ioutil.ReadFile(filename + ".json")
 	_ = json.Unmarshal([]byte(jsonFile), &item)
-	h, err := os.Open(filename+".hnn")
+	h, err := os.Open(filename + ".hnn")
 	defer h.Close()
 	if err == nil {
 		item.Net.HiddenWeights.Reset()
 		item.Net.HiddenWeights.UnmarshalBinaryFrom(h)
 	}
-	o, err := os.Open(filename+".onn")
+	o, err := os.Open(filename + ".onn")
 	defer o.Close()
 	if err == nil {
 		item.Net.OutputWeights.Reset()
@@ -433,20 +433,18 @@ func (d Database) SaveDBase(filename string) {
 		return
 	}
 	_ = ioutil.WriteFile(filename+".json", output, 0755)
-	h, err := os.Create(filename+".hnn")
+	h, err := os.Create(filename + ".hnn")
 	defer h.Close()
 	if err == nil {
 		Base.Net.HiddenWeights.MarshalBinaryTo(h)
 	}
-	o, err := os.Create(filename+".onn")
+	o, err := os.Create(filename + ".onn")
 	defer o.Close()
 	if err == nil {
 		Base.Net.OutputWeights.MarshalBinaryTo(o)
 	}
 	fmt.Println("Saved " + filename + "!")
 }
-
-
 
 //Regex lets you grab a table where items within a column match a regular expression that you can pass in
 //to the function and pulls whether they do or don't match (true/false)
@@ -613,7 +611,7 @@ func (d Database) Describe(table, dependentcolumn string) {
 	}
 }
 
-//Columns returns a string array of the columns in a specific table 
+//Columns returns a string array of the columns in a specific table
 //Used for when you want to do adjustments on each column via a loop
 func (d Database) Columns(table string) []string {
 	if yes, index := d.verifytable(table); yes == true {
@@ -690,7 +688,7 @@ func (d *Database) Split(tablename, trainingname, testname string, ratio int) {
 
 //KNNclass classifier using a training table to predict output on test table using identifier column.
 //Passes to Buffer
-func (d Database) KNNclass(trainingtable, testtable, identifiercolumn string, knumber int, trainingmode bool) {
+func (d Database) KNNclass(trainingtable, testtable, identifiercolumn string, knumber, threads int, trainingmode bool) {
 	var trainingdata [][]float64
 	var trainingname []string
 	var testingdata [][]float64
@@ -703,12 +701,12 @@ func (d Database) KNNclass(trainingtable, testtable, identifiercolumn string, kn
 		testingname, testingdata = d.Table[table2index].Grabdata(identifiercolumn)
 	}
 	fmt.Println("KNN classification - processing...")
-	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, trainingmode, false)
+	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, threads, trainingmode, false)
 }
 
 //KNNreg regression using a training table to predict numerical output on test table using identifier column.
 //Passes to Buffer
-func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knumber int) {
+func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knumber, threads int) {
 	var trainingdata [][]float64
 	var trainingname []string
 	var testingdata [][]float64
@@ -721,7 +719,7 @@ func (d Database) KNNreg(trainingtable, testtable, identifiercolumn string, knum
 		testingname, testingdata = d.Table[table2index].Grabdata(identifiercolumn)
 	}
 	fmt.Println("KNN regression - processing...")
-	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, false, true)
+	Temptable = models.KNN(trainingdata, testingdata, trainingname, testingname, knumber, threads, false, true)
 }
 
 //NNtrain train a neural network using a training table.
