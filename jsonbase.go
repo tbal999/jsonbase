@@ -1,4 +1,4 @@
-package main
+package jsonbase
 
 import (
 	"encoding/csv"
