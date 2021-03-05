@@ -5,7 +5,7 @@ I aim to make it as easy to use as possible & plan to extend on this and make it
 Advantages:
 Faster than Pandas (for most things that this tool can do).
 Intuitive simple docs.
-Does more i.e KNN and ANN prediction.
+Does more i.e concurrent KNN and ANN prediction.
 
 Docs: https://pkg.go.dev/github.com/tbal999/jsonbase
 
@@ -69,7 +69,7 @@ What can you do with it?
 ## ML / stats
 - You can describe a dataset on a specific column via 'Describe()' (gives you average / standard deviation for each item in a column)
 - You can plot scatterplots (making use of termui library)
-- You can use KNN machine learning algorithm - bruteforce algorithm only atm so smaller datasets only.
+- You can use KNN machine learning algorithm - bruteforce algorithm with concurrency to make it much faster (try low numbers first!).
 - For larger datasets you can use artificial neural network via NNtrain and NNpredict.
 
 Using a combination of the above alongside the buffer, you can perform a lot of tasks.
