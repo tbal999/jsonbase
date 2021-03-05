@@ -3,24 +3,31 @@ package models
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"sort"
 	"strconv"
 	"time"
-	"math/rand"
 
 	"github.com/cheggaaa/pb"
 	"gonum.org/v1/gonum/mat"
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
-//BRUTE FORCE KNN ALGORITHM & helper FUNCTIONS ////////////////////////////////////////////////////////////////////////
+//helper FUNCTIONS ////////////////////////////////////////////////////////////////////////
 
-func squareDistance(features1, features2 []float64) float64 {
+func ccsquareDistance(features1, features2 []float64, name string, ch chan struct {
+	name   string
+	number float64
+}) {
 	var d float64
 	for i := range features1 {
 		d += (features1[i] - features2[i]) * (features1[i] - features2[i])
 	}
-	return math.Sqrt(d)
+	new := struct {
+		name   string
+		number float64
+	}{name, d}
+	ch <- new
 }
 
 func calcaverage(items []float64) string {
@@ -53,60 +60,80 @@ func rangeMap(words []string) string {
 	return largest
 }
 
-func KNN(training, testing [][]float64, trainingname, testingname []string, k int, train, regression bool) [][]string {
+//concurrent KNN algorithm (you choose how many threads/goroutines you want working at once)
+func knnsec(testindex int, training, testing [][]float64, trainingname, testingname []string, k int, train, regression bool, ch chan []string) {
+	out := []struct {
+		name   string
+		number float64
+	}{}
+	input := []string{}
+	candidates := []string{}
+	regdates := []float64{}
+	if train == true {
+		input = append(input, testingname[testindex])
+	} else {
+		input = append(input, strconv.Itoa(testindex+1))
+	}
+	var likely string
+	for trainindex := range training {
+		b := squareDistance(testing[testindex], training[trainindex])
+		new := struct {
+			name   string
+			number float64
+		}{trainingname[trainindex], b}
+		out = append(out, new)
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		return out[i].number < out[j].number
+	})
+	if k < len(out)-1 {
+		for i := 0; i <= k; i++ {
+			if regression == true {
+				ax, _ := strconv.ParseFloat(out[i].name, 64)
+				regdates = append(regdates, ax)
+			} else {
+				ix := out[i].name
+				candidates = append(candidates, ix)
+			}
+		}
+	} else {
+		fmt.Printf("       The K number must be less than training sample size. Recommended starting number for this sample is %f\n", math.Sqrt(float64(len(training))))
+		ch <- nil
+		return
+	}
+	if regression == true {
+		averagedata := calcaverage(regdates)
+		input = append(input, averagedata)
+	} else {
+		likely = rangeMap(candidates)
+		input = append(input, likely)
+	}
+	ch <- input
+}
+
+func KNN(training, testing [][]float64, trainingname, testingname []string, k, threads int, train, regression bool) [][]string {
+	fmt.Printf("Threads: %d\n", threads)
 	output := [][]string{}
 	Headers := []string{"INDEX", "PREDICTION"}
 	output = append(output, Headers)
+	ch := make(chan []string)
+	chunk := 0
 	bar := pb.StartNew(len(testing))
 	for testindex := range testing {
-		out := []struct {
-			name   string
-			number float64
-		}{}
-		bar.Increment()
-		input := []string{}
-		candidates := []string{}
-		regdates := []float64{}
-		if train == true {
-			input = append(input, testingname[testindex])
-		} else {
-			input = append(input, strconv.Itoa(testindex+1))
-		}
-		var likely string
-		for trainindex := range training {
-			b := squareDistance(testing[testindex], training[trainindex])
-			new := struct {
-				name   string
-				number float64
-			}{trainingname[trainindex], b}
-			out = append(out, new)
-		}
-		sort.SliceStable(out, func(i, j int) bool {
-			return out[i].number < out[j].number
-		})
-		if k < len(out)-1 {
-			for i := 0; i <= k; i++ {
-				if regression == true {
-					ax, _ := strconv.ParseFloat(out[i].name, 64)
-					regdates = append(regdates, ax)
-				} else {
-					ix := out[i].name
-					candidates = append(candidates, ix)
+		chunk++
+		go knnsec(testindex, training, testing, trainingname, testingname, k, train, regression, ch)
+		if chunk > threads || testindex == len(testing)-1 {
+			for i := 0; i < chunk; i++ {
+				select {
+				case x, ok := <-ch:
+					if ok {
+						output = append(output, x)
+					}
 				}
 			}
-		} else {
-			fmt.Printf("       The K number must be less than training sample size. Recommended starting number for this sample is %f\n", math.Sqrt(float64(len(training))))
-			return nil
+			chunk = 0
 		}
-		if regression == true {
-			averagedata := calcaverage(regdates)
-			input = append(input, averagedata)
-			output = append(output, input)
-		} else {
-			likely = rangeMap(candidates)
-			input = append(input, likely)
-			output = append(output, input)
-		}
+		bar.Increment()
 	}
 	bar.Finish()
 	var counter float64
@@ -133,7 +160,7 @@ type Network struct {
 	HiddenWeights *mat.Dense
 	OutputWeights *mat.Dense
 	LearningRate  float64
-	Targetmap map[int]string
+	Targetmap     map[int]string
 }
 
 func CreateNN(input, hidden, output int, rate float64) (net Network) {
@@ -301,19 +328,19 @@ func (n *Network) Train(training [][]float64, trainingname []string, epochcount 
 	t1 := time.Now()
 	bar := pb.StartNew(epochcount)
 	for epochs := 0; epochs < epochcount; epochs++ {
-			for index := range training {
-				traindata := training[index]
-				targets := make([]float64, net.Outputs)
-				inputss := make([]float64, net.Inputs)
-				for i := range targets {
-						targets[i] = 0.001
-				}
-				for i := range inputss {
-					inputss[i] = (traindata[i] / 255.0 * 0.999) + 0.001
-				}
-				targets[tmap[trainingname[index]]] = 0.999
-				net.train(inputss, targets)
+		for index := range training {
+			traindata := training[index]
+			targets := make([]float64, net.Outputs)
+			inputss := make([]float64, net.Inputs)
+			for i := range targets {
+				targets[i] = 0.001
 			}
+			for i := range inputss {
+				inputss[i] = (traindata[i] / 255.0 * 0.999) + 0.001
+			}
+			targets[tmap[trainingname[index]]] = 0.999
+			net.train(inputss, targets)
+		}
 		if epochs == 0 {
 			prevstate = net.predicttrain(training, trainingname)
 			s2 := fmt.Sprintf("%.2f", prevstate)
@@ -325,10 +352,10 @@ func (n *Network) Train(training [][]float64, trainingname []string, epochcount 
 			if s1 != s2 {
 				fmt.Printf("\nEpoch: %d, Accuracy: %s\n", epochs, s1)
 				prevstate = currentstate
-			} 
+			}
 		}
 		bar.Increment()
-		}
+	}
 	bar.Finish()
 	elapsed := time.Since(t1)
 	fmt.Printf("\nTime taken to train: %s\n", elapsed)
@@ -355,7 +382,7 @@ func (net *Network) predicttrain(training [][]float64, trainingname []string) fl
 			score++
 		}
 	}
-	return float64(score)/float64(len(trainingname)-1)
+	return float64(score) / float64(len(trainingname)-1)
 }
 
 func (net *Network) Predict(training [][]float64) [][]string {
@@ -376,7 +403,7 @@ func (net *Network) Predict(training [][]float64) [][]string {
 				highest = outputs.At(i, 0)
 			}
 		}
-		row := []string{strconv.Itoa(index),net.Targetmap[best]} 
+		row := []string{strconv.Itoa(index), net.Targetmap[best]}
 		output = append(output, row)
 	}
 	return output
