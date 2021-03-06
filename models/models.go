@@ -79,20 +79,14 @@ func knnsec(testindex int, training, testing [][]float64, trainingname, testingn
 	sort.SliceStable(out, func(i, j int) bool {
 		return out[i].number < out[j].number
 	})
-	if k < len(out)-1 {
-		for i := 0; i <= k; i++ {
-			if regression == true {
-				ax, _ := strconv.ParseFloat(out[i].name, 64)
-				regdates = append(regdates, ax)
-			} else {
-				ix := out[i].name
-				candidates = append(candidates, ix)
-			}
+	for i := 0; i <= k; i++ {
+		if regression == true {
+			ax, _ := strconv.ParseFloat(out[i].name, 64)
+			regdates = append(regdates, ax)
+		} else {
+			ix := out[i].name
+			candidates = append(candidates, ix)
 		}
-	} else {
-		fmt.Printf("       The K number must be less than training sample size. Recommended starting number for this sample is %f\n", math.Sqrt(float64(len(training))))
-		ch <- nil
-		return
 	}
 	if regression == true {
 		averagedata := calcaverage(regdates)
@@ -105,6 +99,10 @@ func knnsec(testindex int, training, testing [][]float64, trainingname, testingn
 }
 
 func KNN(training, testing [][]float64, trainingname, testingname []string, k, threads int, train, regression bool) [][]string {
+	if k > len(training)-1 {
+		fmt.Printf("       The K number must be less than training sample size. Recommended starting number for this sample is %f\n", math.Sqrt(float64(len(training))))
+		return nil
+	}
 	fmt.Printf("Threads: %d\n", threads)
 	output := [][]string{}
 	Headers := []string{"INDEX", "PREDICTION"}
