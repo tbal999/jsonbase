@@ -643,7 +643,7 @@ func (t Table) Count(column string) [][]string {
 
 func (t Table) Join(t2 Table, tcolumn, t2column string) [][]string {
 	column1index, real1 := t.verifycolumn(tcolumn)
-	column2index, real2 := t.verifycolumn(t2column)
+	column2index, real2 := t2.verifycolumn(t2column)
 	if real1 && real2 == true {
 		hash1Dtable := make(map[[32]byte][]string)
 		output := [][]string{}
