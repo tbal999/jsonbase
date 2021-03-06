@@ -72,4 +72,5 @@ What can you do with it?
 - You can use KNN machine learning algorithm - bruteforce algorithm with concurrency to make it much faster (try low numbers first!).
 - For larger datasets you can use artificial neural network via NNtrain and NNpredict.
 
-Using a combination of the above alongside the buffer, you can perform a lot of tasks.
+Using a combination of the above alongside the buffer, you can perform a lot of data analysis tasks.
+Once you've put together a pipeline that you want to automate, you can then build it and deploy it as an application.
