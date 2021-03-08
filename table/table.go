@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"math"
+	"math/rand"
 	"regexp"
 	"sort"
 	"strconv"
@@ -11,7 +12,6 @@ import (
 	"sync"
 	"time"
 	"unicode"
-	"math/rand"
 
 	ui "github.com/gizak/termui/v3"              //for scatterplots
 	widgets "github.com/gizak/termui/v3/widgets" //for scatterplots
@@ -120,18 +120,18 @@ func samplerate(x []float64) []float64 {
 	sample := []float64{}
 	var lowerquartile float64
 	var upperquartile float64
-	lNumberf :=  math.Floor(0.25 * float64(len(x)))
+	lNumberf := math.Floor(0.25 * float64(len(x)))
 	lNumber := int(lNumberf)
-	uNumberf :=  math.Floor(0.75 * float64(len(x)))
+	uNumberf := math.Floor(0.75 * float64(len(x)))
 	uNumber := int(uNumberf)
-	if len(x) % 2 == 0 {
-		upperquartile =  (x[uNumber-1] + x[uNumber]) / 2
+	if len(x)%2 == 0 {
+		upperquartile = (x[uNumber-1] + x[uNumber]) / 2
 		lowerquartile = (x[lNumber-1] + x[lNumber]) / 2
 	} else {
 		upperquartile = x[uNumber]
-		lowerquartile =  x[lNumber]
+		lowerquartile = x[lNumber]
 	}
-	interquartile := upperquartile-lowerquartile
+	interquartile := upperquartile - lowerquartile
 	min := lowerquartile - 1.5*interquartile
 	max := upperquartile + 1.5*interquartile
 	r := rand.New(rand.NewSource(time.Now().Unix()))
@@ -193,23 +193,36 @@ func collate(main string, row, columns []string) [][]string {
 	newcolumns := []string{}
 	newrow := []string{}
 	var first bool
-loop0:
+	newcolumns, newrow = collate2(main, &newcolumns, &newrow, first, row, columns)
+	output = collate3(main, newcolumns, newrow, rowindex, &output)
+	return output
+}
+
+func collate2(main string, n, nr *[]string, first bool, row, columns []string) ([]string, []string) {
+	newcolumns := *n
+	newrow := *nr
 	for index := range columns {
 		if first == false {
 			if columns[index] == main {
-			newcolumns = append(newcolumns, columns[index])
-			newrow = append(newrow, row[index])
-			first = true
-			goto loop0
+				newcolumns = append(newcolumns, columns[index])
+				newrow = append(newrow, row[index])
+				first = true
+				*n = newcolumns
+				*nr = newrow
+				newcolumns, newrow = collate2(main, n, nr, first, row, columns)
 			}
 		} else {
 			if columns[index] != main {
-			newcolumns = append(newcolumns, columns[index])
-			newrow = append(newrow, row[index])
+				newcolumns = append(newcolumns, columns[index])
+				newrow = append(newrow, row[index])
 			}
 		}
 	}
-loop:
+	return newcolumns, newrow
+}
+
+func collate3(main string, newcolumns, newrow []string, rowindex int, o *[][]string) [][]string {
+	output := *o
 	columnindex := 0
 	for columnindex < len(newcolumns) {
 		item := []string{}
@@ -225,7 +238,8 @@ loop:
 		if len(newcolumns) > 1 {
 			item = append(item, newrow[rowindex])
 			output = append(output, item)
-			goto loop
+			*o = output
+			output = collate3(main, newcolumns, newrow, rowindex, o)
 		}
 	}
 	return output
@@ -353,7 +367,7 @@ func (t Table) plotgrab(identifiercolumn, datacolumn string) (names []string, da
 }
 
 func (t Table) collectdata(column, column2 string) map[string][]float64 {
-output := make(map[string][]float64)
+	output := make(map[string][]float64)
 	_, real := t.verifycolumn(column)
 	if real == true {
 		names, data := t.plotgrab(column, column2)
@@ -685,27 +699,27 @@ func (t Table) Describe(column string) {
 				if t.Columns[index2] != column {
 					mean, dev := t.mean(index2, column1index, columnnames[index])
 					fmt.Printf("For column '%s' - average is %f, standard deviation is %f\n", t.Columns[index2], mean, dev)
-					
+
 				}
 			}
 			fmt.Println("")
 		}
 		for index2 := range t.Columns {
-				t.Focusdata(column,t.Columns[index2]) 
+			t.Focusdata(column, t.Columns[index2])
 		}
 	}
 	fmt.Println("Consider removing outliers from source data")
 }
 
 func (t Table) Grabdatatest() (data [][]float64) {
-		for index := range t.Rows {
-			item := []float64{}
-			for columnindex := range t.Rows[index] {
-					x, _ := strconv.ParseFloat(t.Rows[index][columnindex], 64)
-					item = append(item, x)
-			}
-			data = append(data, item)
+	for index := range t.Rows {
+		item := []float64{}
+		for columnindex := range t.Rows[index] {
+			x, _ := strconv.ParseFloat(t.Rows[index][columnindex], 64)
+			item = append(item, x)
 		}
+		data = append(data, item)
+	}
 	return data
 }
 
@@ -728,14 +742,14 @@ func (t Table) Grabdata(identifiercolumn string) (names []string, data [][]float
 	return names, data
 }
 
-func (t Table) Focusdata(column1, column2 string ) {
-	output := t.collectdata(column1,column2)
+func (t Table) Focusdata(column1, column2 string) {
+	output := t.collectdata(column1, column2)
 	var item string
 	list := []float64{}
 	for index, plotdata := range output {
 		item = index
 		list = plotdata
-		fmt.Println("For: "+item+" - column: " +column2)
+		fmt.Println("For: " + item + " - column: " + column2)
 		sort.Float64s(list)
 		minoutliers, maxoutliers := t.stats(list)
 		fmt.Printf("Min outliers: %f\n", minoutliers)
@@ -749,18 +763,18 @@ func (t Table) stats(x []float64) ([]float64, []float64) {
 	maxout := []float64{}
 	var lowerquartile float64
 	var upperquartile float64
-	lNumberf :=  math.Floor(0.25 * float64(len(x)))
+	lNumberf := math.Floor(0.25 * float64(len(x)))
 	lNumber := int(lNumberf)
-	uNumberf :=  math.Floor(0.75 * float64(len(x)))
+	uNumberf := math.Floor(0.75 * float64(len(x)))
 	uNumber := int(uNumberf)
-	if len(x) % 2 == 0 {
-		upperquartile =  (x[uNumber-1] + x[uNumber]) / 2
+	if len(x)%2 == 0 {
+		upperquartile = (x[uNumber-1] + x[uNumber]) / 2
 		lowerquartile = (x[lNumber-1] + x[lNumber]) / 2
 	} else {
 		upperquartile = x[uNumber]
-		lowerquartile =  x[lNumber]
+		lowerquartile = x[lNumber]
 	}
-	interquartile := upperquartile-lowerquartile
+	interquartile := upperquartile - lowerquartile
 	min := lowerquartile - 1.5*interquartile
 	max := upperquartile + 1.5*interquartile
 	for index := range x {
@@ -779,7 +793,7 @@ func (t Table) Plot(column string) {
 	columns := []string{}
 	for index := range t.Columns {
 		if t.Columns[index] != column {
-			output := t.collectdata(column,t.Columns[index])
+			output := t.collectdata(column, t.Columns[index])
 			columns = append(columns, t.Columns[index])
 			mainlist = append(mainlist, output)
 		}
@@ -788,7 +802,7 @@ func (t Table) Plot(column string) {
 		fmt.Println("Error generating plot")
 		return
 	}
-	x := len(mainlist)-1
+	x := len(mainlist) - 1
 	defer ui.Close()
 	scatterinit(1, mainlist, columns, column)
 	uiEvents := ui.PollEvents()
@@ -799,7 +813,7 @@ func (t Table) Plot(column string) {
 			return
 		case "a":
 			if x == 0 {
-				x = len(mainlist)-1
+				x = len(mainlist) - 1
 			} else {
 				x--
 			}
