@@ -7,6 +7,9 @@ Faster than Pandas (for most things that this tool can do - will upload benchmar
 Intuitive simple docs.
 Does more i.e concurrent KNN and ANN prediction.
 
+Disadvantages:
+Only does a tiny slice of what pandas is capable of - but of the things it can do, it does well!
+
 Docs: https://pkg.go.dev/github.com/tbal999/jsonbase
 
 Below is an example of it being used as a simple console application.
