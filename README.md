@@ -3,7 +3,7 @@ minimalistic declarative data manipulation library developed 27th Sep onwards. P
 I aim to make it as easy to use as possible & plan to extend on this and make it more useful over time.
 
 Advantages:
-Faster than Pandas (for most things that this tool can do - will upload benchmark somday).
+Faster than Pandas (for most things that this tool can do - will upload benchmark someday).
 Intuitive simple docs.
 Does more i.e concurrent KNN and ANN prediction.
 
