@@ -1,4 +1,6 @@
-# jsonbase
+# jsonbase 
+todo - needs linting
+
 minimalistic declarative data manipulation library developed 27th Sep onwards. Primary reason for writing this was to learn more about data engineering & data science. You might find it useful.
 I aim to make it as easy to use as possible & plan to extend on this and make it more useful over time.
 
