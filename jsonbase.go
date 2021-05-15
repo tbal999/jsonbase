@@ -32,8 +32,7 @@ var Temptable [][]string
 /////////////////////      HELPER FUNCTIONS  /////////////////////////////
 
 func grabsubstring(x string) (string, string) {
-	if yes, _ := regexp.MatchString(`\[([^\[\]]*)\]`, x); yes == true {
-		re := regexp.MustCompile(`\[([^\[\]]*)\]`)
+	if yes, re := regexp.MatchString(`\[([^\[\]]*)\]`, x); yes == true {
 		submatchall := re.FindAllString(x, -1)
 		for _, element := range submatchall {
 			element = strings.Trim(element, "[")
